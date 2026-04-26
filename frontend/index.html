@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- ─── PWA Core ─────────────────────────────────────── -->
+    <meta name="theme-color" content="#1A4FFF" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- ─── Apple / iOS PWA ──────────────────────────────── -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Kultour" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <!-- Splash screens iOS (portrait) -->
+    <link rel="apple-touch-startup-image"
+      media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
+      href="/icons/splash-390x844.png" />
+    <link rel="apple-touch-startup-image"
+      media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+      href="/icons/splash-375x812.png" />
+
+    <!-- ─── SEO & Social ──────────────────────────────────── -->
+    <meta name="description" content="Descubre eventos, lugares y planes únicos en La Paz, Bolivia — la ciudad más alta del mundo." />
+    <meta name="keywords" content="La Paz, Bolivia, eventos, lugares, bares, restaurantes, cultura, turismo" />
+    <meta property="og:title" content="Kultour — Descubre La Paz" />
+    <meta property="og:description" content="Eventos, lugares y planes en La Paz, Bolivia." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/icons/icon-512.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- ─── Favicon ───────────────────────────────────────── -->
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96.png" />
+
+    <!-- ─── Fonts ─────────────────────────────────────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+    <title>Kultour — Descubre La Paz</title>
+
+    <!-- ─── Safe area insets para notch/Dynamic Island ────── -->
+    <style>
+      :root {
+        --sat: env(safe-area-inset-top);
+        --sab: env(safe-area-inset-bottom);
+        --sal: env(safe-area-inset-left);
+        --sar: env(safe-area-inset-right);
+      }
+      /* Previene flash blanco en carga */
+      html { background-color: #F8FAFC; }
+      /* Splash screen mientras carga JS */
+      #splash {
+        position: fixed; inset: 0;
+        background: linear-gradient(135deg, #1A4FFF 0%, #10B981 100%);
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        z-index: 9999; transition: opacity 0.4s ease;
+      }
+      #splash.hidden { opacity: 0; pointer-events: none; }
+      #splash-logo {
+        width: 72px; height: 72px; border-radius: 20px;
+        background: rgba(255,255,255,0.2);
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 16px;
+        animation: pulse-logo 1.5s ease-in-out infinite;
+      }
+      #splash-logo svg { width: 36px; height: 36px; }
+      #splash-title {
+        color: white; font-size: 28px; font-weight: 800;
+        font-family: system-ui, sans-serif; letter-spacing: -0.5px;
+      }
+      #splash-sub {
+        color: rgba(255,255,255,0.7); font-size: 14px;
+        font-family: system-ui, sans-serif; margin-top: 6px;
+      }
+      @keyframes pulse-logo {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Splash screen (se oculta cuando React monta) -->
+    <div id="splash">
+      <div id="splash-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+        </svg>
+      </div>
+      <div id="splash-title">Kultour</div>
+      <div id="splash-sub">Descubre La Paz 🏔️</div>
+    </div>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Oculta el splash cuando React termina de montar -->
+    <script>
+      window.__hideSplash = function() {
+        var s = document.getElementById('splash');
+        if (s) {
+          s.classList.add('hidden');
+          setTimeout(function() { s.remove(); }, 500);
+        }
+      };
+    </script>
+  </body>
+</html>

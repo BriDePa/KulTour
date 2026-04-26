@@ -1,0 +1,383 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 248 250 252;
+    --foreground: 15 23 42;
+    --brand-blue: 26 79 255;
+    --brand-green: 16 185 129;
+    --brand-orange: 255 144 0;
+    --radius: 1rem;
+    /* Safe areas para notch y home indicator */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+  }
+
+  * {
+    @apply border-surface-200;
+    box-sizing: border-box;
+    /* Mejora el tap en móvil */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Previene zoom accidental en inputs en iOS */
+    touch-action: manipulation;
+  }
+
+  body {
+    @apply bg-surface-50 text-surface-900 font-sans;
+    background-image: radial-gradient(
+        ellipse at 10% 0%,
+        rgba(26, 79, 255, 0.04) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse at 90% 100%,
+        rgba(16, 185, 129, 0.04) 0%,
+        transparent 50%
+      );
+    background-attachment: fixed;
+    /* Espacio para bottom nav en móvil */
+    padding-bottom: calc(64px + var(--safe-bottom));
+    /* Previene overscroll bounce en iOS */
+    overscroll-behavior: none;
+  }
+
+  /* Quita el padding bottom cuando no hay bottom nav (desktop) */
+  @media (min-width: 768px) {
+    body {
+      padding-bottom: 0;
+    }
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+
+  /* Inputs: font-size 16px mínimo en iOS para no hacer zoom */
+  input, select, textarea {
+    font-size: max(16px, 1em);
+  }
+  @media (min-width: 768px) {
+    input, select, textarea {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+@layer components {
+  /* ─── Scrollbar personalizado ─── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-surface-100; }
+  ::-webkit-scrollbar-thumb { @apply bg-surface-300 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-surface-400; }
+
+  /* ─── Glassmorphism ─── */
+  .glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+  .glass-dark {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* ─── Cards ─── */
+  .card-base {
+    @apply bg-white rounded-3xl shadow-card transition-all duration-300;
+  }
+  .card-hover {
+    @apply hover:shadow-card-hover hover:-translate-y-1;
+  }
+
+  /* ─── Gradient text ─── */
+  .text-gradient-blue {
+    @apply bg-gradient-to-r from-brand-blue-500 to-brand-blue-700 bg-clip-text text-transparent;
+  }
+  .text-gradient-green {
+    @apply bg-gradient-to-r from-brand-green-500 to-brand-green-700 bg-clip-text text-transparent;
+  }
+  .text-gradient-brand {
+    @apply bg-gradient-to-r from-brand-blue-500 via-brand-green-500 to-brand-orange-500 bg-clip-text text-transparent;
+  }
+
+  /* ─── Buttons ─── */
+  .btn-primary {
+    @apply bg-brand-blue-500 hover:bg-brand-blue-600 active:bg-brand-blue-700
+           text-white font-semibold px-6 py-3 rounded-2xl transition-all duration-150
+           shadow-soft hover:shadow-glow active:scale-95
+           inline-flex items-center gap-2 select-none;
+    /* Área mínima táctil de 44px */
+    min-height: 44px;
+  }
+  .btn-secondary {
+    @apply bg-white hover:bg-surface-50 active:bg-surface-100
+           text-surface-800 font-semibold px-6 py-3 rounded-2xl transition-all duration-150
+           shadow-soft border border-surface-200 hover:border-surface-300
+           active:scale-95 inline-flex items-center gap-2 select-none;
+    min-height: 44px;
+  }
+  .btn-ghost {
+    @apply text-surface-600 hover:text-surface-900 hover:bg-surface-100 active:bg-surface-200
+           font-medium px-4 py-2 rounded-xl transition-all duration-150
+           inline-flex items-center gap-2 select-none;
+    min-height: 44px;
+  }
+
+  /* ─── Inputs ─── */
+  .input-base {
+    @apply w-full bg-white border border-surface-200 rounded-2xl px-4 py-3
+           text-surface-900 placeholder:text-surface-400 outline-none
+           transition-all duration-200 font-sans
+           focus:border-brand-blue-400 focus:ring-4 focus:ring-brand-blue-500/10;
+    min-height: 48px;
+  }
+
+  /* ─── Badge ─── */
+  .badge { @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold; }
+  .badge-blue { @apply badge bg-brand-blue-50 text-brand-blue-600; }
+  .badge-green { @apply badge bg-brand-green-50 text-brand-green-600; }
+  .badge-orange { @apply badge bg-brand-orange-50 text-brand-orange-600; }
+
+  /* ─── Section container ─── */
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* ─── Skeleton loading ─── */
+  .skeleton { @apply animate-pulse bg-surface-200 rounded-2xl; }
+
+  /* ─── Bottom Navigation (solo móvil) ─── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding-bottom: var(--safe-bottom);
+    height: calc(64px + var(--safe-bottom));
+    display: flex;
+    align-items: flex-start;
+    padding-top: 8px;
+  }
+
+  .bottom-nav-item {
+    @apply flex-1 flex flex-col items-center gap-1 py-1 transition-all duration-200
+           text-surface-400 select-none cursor-pointer active:scale-90;
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .bottom-nav-item.active {
+    @apply text-brand-blue-500;
+  }
+
+  .bottom-nav-item span {
+    @apply text-[10px] font-semibold;
+  }
+
+  /* ─── PWA install banner ─── */
+  .pwa-banner {
+    @apply fixed bottom-0 left-0 right-0 z-50 bg-surface-900 text-white
+           flex items-center gap-3 px-4 py-4 shadow-card-hover;
+    padding-bottom: calc(1rem + var(--safe-bottom));
+  }
+
+  /* ─── Pull to refresh indicator ─── */
+  .ptr-indicator {
+    @apply absolute top-0 left-0 right-0 flex justify-center
+           py-3 text-brand-blue-500 font-medium text-sm;
+  }
+
+  /* ─── Sticky header con safe area ─── */
+  .sticky-header {
+    @apply sticky z-50 glass border-b border-white/60;
+    top: var(--safe-top, 0);
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .text-balance { text-wrap: balance; }
+
+  /* Safe area utilities */
+  .pt-safe { padding-top: var(--safe-top); }
+  .pb-safe { padding-bottom: var(--safe-bottom); }
+  .pl-safe { padding-left: var(--safe-left); }
+  .pr-safe { padding-right: var(--safe-right); }
+
+  /* Área táctil mínima */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    @apply flex items-center justify-center;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PARTE 2 — TYPOGRAPHY & SPACING FIXES
+   ═══════════════════════════════════════════════════════════ */
+
+@layer base {
+  /* ─── Line heights más generosos ─────────────────────────── */
+  p, li, span, div {
+    line-height: 1.65;
+  }
+
+  h1 { line-height: 1.05; letter-spacing: -0.03em; }
+  h2 { line-height: 1.1;  letter-spacing: -0.025em; }
+  h3 { line-height: 1.2;  letter-spacing: -0.015em; }
+  h4 { line-height: 1.3;  letter-spacing: -0.01em; }
+
+  /* ─── Móvil: tamaños de texto más legibles ────────────────── */
+  @media (max-width: 640px) {
+    .text-xs   { font-size: 0.8rem;   line-height: 1.5; }
+    .text-sm   { font-size: 0.9rem;   line-height: 1.6; }
+    .text-base { font-size: 1rem;     line-height: 1.65; }
+    .text-lg   { font-size: 1.125rem; line-height: 1.5; }
+    .text-xl   { font-size: 1.25rem;  line-height: 1.4; }
+    .text-2xl  { font-size: 1.5rem;   line-height: 1.3; }
+    .text-3xl  { font-size: 1.875rem; line-height: 1.15; }
+    .text-4xl  { font-size: 2.1rem;   line-height: 1.1; }
+    .text-5xl  { font-size: 2.5rem;   line-height: 1.05; }
+  }
+
+  /* ─── Espaciado entre secciones ──────────────────────────── */
+  section + section { margin-top: 0; }
+}
+
+@layer components {
+  /* ─── Cards: más padding en móvil ────────────────────────── */
+  @media (max-width: 640px) {
+    .card-base { @apply rounded-2xl; }
+
+    /* Padding interno de cards más holgado */
+    .card-base > div,
+    .card-base > article {
+      padding: 1.25rem;
+    }
+  }
+
+  /* ─── Prose: texto de descripción más legible ─────────────── */
+  .prose-kultour {
+    @apply text-surface-600 leading-relaxed;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+  }
+
+  /* ─── Section headings con espacio correcto ───────────────── */
+  .section-heading {
+    @apply font-display font-extrabold text-surface-900;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .section-subheading {
+    @apply text-surface-500 leading-relaxed;
+    font-size: clamp(0.95rem, 2.5vw, 1.125rem);
+    margin-top: 0.75rem;
+  }
+
+  /* ─── Page header gradient (usado en múltiples páginas) ───── */
+  .page-header {
+    @apply pt-8 pb-16 sm:pt-10 sm:pb-20;
+  }
+
+  .page-header h1 {
+    font-size: clamp(1.75rem, 6vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    @apply font-display font-extrabold;
+  }
+
+  .page-header p {
+    font-size: clamp(0.9rem, 2.5vw, 1.125rem);
+    line-height: 1.65;
+    @apply text-white/70 mt-2;
+  }
+
+  /* ─── Event/Place card typography ────────────────────────── */
+  .card-title {
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    @apply font-display font-bold text-surface-900;
+  }
+
+  .card-description {
+    font-size: clamp(0.82rem, 2vw, 0.875rem);
+    line-height: 1.6;
+    @apply text-surface-500;
+  }
+
+  .card-meta {
+    font-size: clamp(0.75rem, 1.8vw, 0.8rem);
+    line-height: 1.5;
+    @apply text-surface-400 font-medium;
+  }
+
+  /* ─── Badges más legibles ─────────────────────────────────── */
+  .badge {
+    font-size: 0.72rem;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    padding: 0.3rem 0.65rem;
+  }
+
+  /* ─── Buttons: texto más claro ─────────────────────────────── */
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost {
+    letter-spacing: -0.01em;
+    font-size: 0.9rem;
+  }
+
+  /* ─── Input labels ─────────────────────────────────────────── */
+  .input-label {
+    @apply block text-sm font-semibold text-surface-700 mb-2;
+    letter-spacing: -0.005em;
+  }
+
+  /* ─── Empty states ─────────────────────────────────────────── */
+  .empty-state-title {
+    font-size: clamp(1.125rem, 3vw, 1.25rem);
+    @apply font-display font-bold text-surface-900;
+  }
+
+  .empty-state-text {
+    font-size: clamp(0.875rem, 2vw, 0.95rem);
+    @apply text-surface-500 leading-relaxed;
+  }
+
+  /* ─── Fix: line-clamp en cards ─────────────────────────────── */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}

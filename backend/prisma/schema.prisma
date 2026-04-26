@@ -1,0 +1,131 @@
+// schema.prisma - Kultour Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ORGANIZER
+  ADMIN
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  FINISHED
+}
+
+enum PlaceCategory {
+  BAR
+  RESTAURANT
+  CULTURAL_CENTER
+  MUSEUM
+  PARK
+  CLUB
+  CAFE
+  GALLERY
+  THEATER
+  OTHER
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  name        String
+  password    String
+  role        Role      @default(USER)
+  avatar      String?
+  bio         String?
+  phone       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  events      Event[]
+  places      Place[]
+
+  @@map("users")
+}
+
+model City {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  country     String    @default("Bolivia")
+  latitude    Float
+  longitude   Float
+  timezone    String    @default("America/La_Paz")
+  createdAt   DateTime  @default(now())
+
+  events      Event[]
+  places      Place[]
+
+  @@map("cities")
+}
+
+model Event {
+  id           String      @id @default(uuid())
+  title        String
+  description  String
+  imageUrl     String?
+  date         DateTime
+  endDate      DateTime?
+  price        Float       @default(0)
+  isFree       Boolean     @default(false)
+  capacity     Int?
+  venue        String
+  address      String
+  latitude     Float?
+  longitude    Float?
+  tags         String[]
+  status       EventStatus @default(PUBLISHED)
+  category     String?
+  featured     Boolean     @default(false)
+  ticketUrl    String?
+  
+  cityId       String
+  city         City        @relation(fields: [cityId], references: [id])
+  
+  organizerId  String
+  organizer    User        @relation(fields: [organizerId], references: [id])
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@map("events")
+}
+
+model Place {
+  id           String        @id @default(uuid())
+  name         String
+  description  String
+  imageUrl     String?
+  category     PlaceCategory @default(OTHER)
+  address      String
+  latitude     Float?
+  longitude    Float?
+  phone        String?
+  website      String?
+  instagram    String?
+  openingHours Json?
+  rating       Float?        @default(0)
+  priceRange   String?
+  tags         String[]
+  featured     Boolean       @default(false)
+
+  cityId       String
+  city         City          @relation(fields: [cityId], references: [id])
+
+  ownerId      String?
+  owner        User?         @relation(fields: [ownerId], references: [id])
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("places")
+}
