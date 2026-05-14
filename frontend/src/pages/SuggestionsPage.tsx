@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Loader2, RefreshCw, ArrowRight } from "lucide-react";
+import { Sparkles, Loader2, RefreshCw, ArrowRight, Palette, PartyPopper, Coffee, Heart, Users, User, CircleDollarSign, Gem, Sunrise, Sun, Moon, HelpCircle, Theater, DollarSign, MapPin } from "lucide-react";
 import { useSuggestions } from "@/hooks/useKultour";
 import EventCard from "@/components/shared/EventCard";
 import PlaceCard from "@/components/shared/PlaceCard";
 import { cn } from "@/lib/utils";
 import type { SuggestionQuery } from "@/types";
 
-// ─── Option button ────────────────────────────────────────
 function OptionButton({
-  emoji, label, description, selected, onClick,
+  icon: Icon, label, description, selected, onClick, iconColor,
 }: {
-  emoji: string; label: string; description: string; selected: boolean; onClick: () => void;
+  icon: any; label: string; description: string; selected: boolean; onClick: () => void; iconColor?: string;
 }) {
   return (
     <motion.button
@@ -21,17 +20,19 @@ function OptionButton({
       className={cn(
         "w-full text-left p-4 rounded-2xl border-2 transition-all duration-200 flex items-start gap-3",
         selected
-          ? "border-brand-blue-400 bg-brand-blue-50 shadow-glow"
-          : "border-surface-200 bg-white hover:border-brand-blue-200 hover:bg-brand-blue-50/30"
+          ? "border-brand-blue-400 dark:border-brand-blue-500 bg-brand-blue-50 dark:bg-brand-blue-900/30 shadow-glow dark:shadow-glow-dark"
+          : "border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 hover:border-brand-blue-300 dark:hover:border-brand-blue-600 hover:bg-brand-blue-50/30 dark:hover:bg-brand-blue-900/20"
       )}
     >
-      <span className="text-2xl mt-0.5 flex-shrink-0">{emoji}</span>
+      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", iconColor || "bg-brand-blue-100 dark:bg-brand-blue-900/30")}>
+        <Icon className={cn("w-5 h-5", selected ? "text-brand-blue-500" : "text-surface-500 dark:text-surface-400")} />
+      </div>
       <div>
-        <p className="font-semibold text-surface-900 text-sm">{label}</p>
-        <p className="text-xs text-surface-500 mt-0.5">{description}</p>
+        <p className="font-semibold text-surface-900 dark:text-surface-100 text-sm">{label}</p>
+        <p className="text-xs text-surface-500 dark:text-surface-400 mt-0.5">{description}</p>
       </div>
       {selected && (
-        <div className="ml-auto flex-shrink-0 w-5 h-5 rounded-full bg-brand-blue-500 flex items-center justify-center">
+        <div className="ml-auto flex-shrink-0 w-5 h-5 rounded-full bg-brand-blue-500 dark:bg-brand-blue-600 flex items-center justify-center">
           <div className="w-2 h-2 rounded-full bg-white" />
         </div>
       )}
@@ -39,7 +40,6 @@ function OptionButton({
   );
 }
 
-// ─── Step component ───────────────────────────────────────
 function Step({ number, title, children, active }: { number: number; title: string; children: React.ReactNode; active?: boolean }) {
   return (
     <div className={cn("transition-opacity duration-300", active ? "opacity-100" : "opacity-60")}>
@@ -47,7 +47,7 @@ function Step({ number, title, children, active }: { number: number; title: stri
         <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-blue-500 to-brand-blue-700 text-white text-sm font-bold flex items-center justify-center">
           {number}
         </div>
-        <h3 className="font-display font-bold text-surface-900">{title}</h3>
+        <h3 className="font-display font-bold text-surface-900 dark:text-surface-50">{title}</h3>
       </div>
       {children}
     </div>
@@ -76,19 +76,19 @@ export default function SuggestionsPage() {
   return (
     <div className="min-h-screen pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-violet-600 to-brand-blue-700 pt-10 pb-20">
+      <div className="bg-gradient-to-br from-violet-600 dark:from-violet-700 to-brand-blue-700 dark:to-surface-800 pt-10 pb-20">
         <div className="section-container text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-5">
+            <div className="w-16 h-16 rounded-2xl bg-white/20 dark:bg-surface-800/40 backdrop-blur-sm flex items-center justify-center mx-auto mb-5">
               <Sparkles className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-4xl lg:text-5xl font-display font-bold text-white mb-3">
               ¿Qué plan buscas?
             </h1>
-            <p className="text-white/70 text-lg max-w-xl mx-auto">
+            <p className="text-white/70 dark:text-white/60 text-lg max-w-xl mx-auto">
               Cuéntanos cómo te sientes y encontramos el plan perfecto para ti en La Paz
             </p>
           </motion.div>
@@ -102,20 +102,21 @@ export default function SuggestionsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-2xl mx-auto"
           >
-            <div className="bg-white rounded-4xl shadow-card-hover p-8 space-y-8">
+            <div className="bg-white dark:bg-surface-800 rounded-4xl shadow-card-hover dark:shadow-card-hover-dark p-8 space-y-8">
               {/* Step 1: Mood */}
               <Step number={1} title="¿Cuál es tu estado de ánimo?" active>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[
-                    { value: "cultural", emoji: "🎭", label: "Cultural", description: "Arte, museos y teatro" },
-                    { value: "fiestero", emoji: "🎉", label: "Fiestero", description: "Música, bares y clubs" },
-                    { value: "tranquilo", emoji: "☕", label: "Tranquilo", description: "Cafés, parques y relax" },
-                    { value: "romántico", emoji: "💑", label: "Romántico", description: "Cenas y lugares íntimos" },
-                    { value: "familiar", emoji: "👨‍👩‍👧", label: "Familiar", description: "Planes para toda la familia" },
+                    { value: "cultural", icon: Theater, iconColor: "bg-violet-100 dark:bg-violet-900/30", label: "Cultural", description: "Arte, museos y teatro" },
+                    { value: "fiestero", icon: PartyPopper, iconColor: "bg-pink-100 dark:bg-pink-900/30", label: "Fiestero", description: "Música, bares y clubs" },
+                    { value: "tranquilo", icon: Coffee, iconColor: "bg-amber-100 dark:bg-amber-900/30", label: "Tranquilo", description: "Cafés, parques y relax" },
+                    { value: "romántico", icon: Heart, iconColor: "bg-red-100 dark:bg-red-900/30", label: "Romántico", description: "Cenas y lugares íntimos" },
+                    { value: "familiar", icon: Users, iconColor: "bg-green-100 dark:bg-green-900/30", label: "Familiar", description: "Planes para toda la familia" },
                   ].map((opt) => (
                     <OptionButton
                       key={opt.value}
-                      emoji={opt.emoji}
+                      icon={opt.icon}
+                      iconColor={opt.iconColor}
                       label={opt.label}
                       description={opt.description}
                       selected={query.mood === opt.value}
@@ -129,10 +130,10 @@ export default function SuggestionsPage() {
               <Step number={2} title="¿Con quién vas?" active={!!query.mood}>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
-                    { value: "solo", emoji: "🧍", label: "Solo/a" },
-                    { value: "pareja", emoji: "💑", label: "En pareja" },
-                    { value: "amigos", emoji: "👥", label: "Amigos" },
-                    { value: "familia", emoji: "👨‍👩‍👧", label: "Familia" },
+                    { value: "solo", icon: User, iconColor: "bg-surface-100 dark:bg-surface-700", label: "Solo/a" },
+                    { value: "pareja", icon: Heart, iconColor: "bg-red-100 dark:bg-red-900/30", label: "En pareja" },
+                    { value: "amigos", icon: Users, iconColor: "bg-blue-100 dark:bg-blue-900/30", label: "Amigos" },
+                    { value: "familia", icon: Users, iconColor: "bg-green-100 dark:bg-green-900/30", label: "Familia" },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -140,11 +141,11 @@ export default function SuggestionsPage() {
                       className={cn(
                         "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200 text-sm font-medium",
                         query.groupType === opt.value
-                          ? "border-brand-blue-400 bg-brand-blue-50 text-brand-blue-700"
-                          : "border-surface-200 bg-white text-surface-600 hover:border-brand-blue-200"
+                          ? "border-brand-blue-400 dark:border-brand-blue-500 bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-700 dark:text-brand-blue-400"
+                          : "border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-600 dark:text-surface-400 hover:border-brand-blue-200 dark:hover:border-brand-blue-600"
                       )}
                     >
-                      <span className="text-2xl">{opt.emoji}</span>
+                      <opt.icon className={cn("w-6 h-6", query.groupType === opt.value ? "text-brand-blue-500" : "text-surface-500 dark:text-surface-400")} />
                       {opt.label}
                     </button>
                   ))}
@@ -155,9 +156,9 @@ export default function SuggestionsPage() {
               <Step number={3} title="¿Cuál es tu presupuesto?" active={!!query.mood}>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { value: "bajo", emoji: "💚", label: "Económico", desc: "< Bs. 50" },
-                    { value: "medio", emoji: "💛", label: "Moderado", desc: "Bs. 50–150" },
-                    { value: "alto", emoji: "💎", label: "Premium", desc: "> Bs. 150" },
+                    { value: "bajo", icon: CircleDollarSign, iconColor: "bg-brand-green-50 dark:bg-brand-green-900/30", label: "Económico", desc: "< Bs. 50" },
+                    { value: "medio", icon: CircleDollarSign, iconColor: "bg-brand-orange-50 dark:bg-brand-orange-900/30", label: "Moderado", desc: "Bs. 50–150" },
+                    { value: "alto", icon: Gem, iconColor: "bg-violet-50 dark:bg-violet-900/30", label: "Premium", desc: "> Bs. 150" },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -165,13 +166,13 @@ export default function SuggestionsPage() {
                       className={cn(
                         "flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 transition-all duration-200 text-sm",
                         query.budget === opt.value
-                          ? "border-brand-blue-400 bg-brand-blue-50"
-                          : "border-surface-200 bg-white hover:border-brand-blue-200"
+                          ? "border-brand-blue-400 dark:border-brand-blue-500 bg-brand-blue-50 dark:bg-brand-blue-900/30"
+                          : "border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 hover:border-brand-blue-200 dark:hover:border-brand-blue-600"
                       )}
                     >
-                      <span className="text-xl">{opt.emoji}</span>
-                      <span className="font-semibold text-surface-900">{opt.label}</span>
-                      <span className="text-xs text-surface-500">{opt.desc}</span>
+                      <opt.icon className={cn("w-6 h-6", opt.value === "bajo" ? "text-brand-green-500" : opt.value === "medio" ? "text-brand-orange-500" : "text-violet-500")} />
+                      <span className="font-semibold text-surface-900 dark:text-surface-100">{opt.label}</span>
+                      <span className="text-xs text-surface-500 dark:text-surface-400">{opt.desc}</span>
                     </button>
                   ))}
                 </div>
@@ -181,9 +182,9 @@ export default function SuggestionsPage() {
               <Step number={4} title="¿A qué hora?" active={!!query.mood}>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { value: "mañana", emoji: "🌅", label: "Mañana" },
-                    { value: "tarde", emoji: "☀️", label: "Tarde" },
-                    { value: "noche", emoji: "🌙", label: "Noche" },
+                    { value: "mañana", icon: Sunrise, iconColor: "bg-amber-100 dark:bg-amber-900/30", label: "Mañana" },
+                    { value: "tarde", icon: Sun, iconColor: "bg-orange-100 dark:bg-orange-900/30", label: "Tarde" },
+                    { value: "noche", icon: Moon, iconColor: "bg-indigo-100 dark:bg-indigo-900/30", label: "Noche" },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -191,11 +192,11 @@ export default function SuggestionsPage() {
                       className={cn(
                         "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200 text-sm font-medium",
                         query.timeOfDay === opt.value
-                          ? "border-brand-blue-400 bg-brand-blue-50 text-brand-blue-700"
-                          : "border-surface-200 bg-white text-surface-600 hover:border-brand-blue-200"
+                          ? "border-brand-blue-400 dark:border-brand-blue-500 bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-700 dark:text-brand-blue-400"
+                          : "border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-600 dark:text-surface-400 hover:border-brand-blue-200 dark:hover:border-brand-blue-600"
                       )}
                     >
-                      <span className="text-2xl">{opt.emoji}</span>
+                      <opt.icon className={cn("w-6 h-6", query.timeOfDay === opt.value ? "text-brand-blue-500" : "text-surface-500 dark:text-surface-400")} />
                       {opt.label}
                     </button>
                   ))}
@@ -211,8 +212,8 @@ export default function SuggestionsPage() {
                 className={cn(
                   "w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all duration-200",
                   canSubmit
-                    ? "btn-primary shadow-glow"
-                    : "bg-surface-200 text-surface-400 cursor-not-allowed"
+                    ? "btn-primary shadow-glow dark:shadow-glow-dark"
+                    : "bg-surface-200 dark:bg-surface-700 text-surface-400 dark:text-surface-500 cursor-not-allowed"
                 )}
               >
                 <Sparkles className="w-5 h-5" />
@@ -221,14 +222,13 @@ export default function SuggestionsPage() {
               </motion.button>
 
               {!canSubmit && (
-                <p className="text-center text-xs text-surface-400">
+                <p className="text-center text-xs text-surface-400 dark:text-surface-500">
                   Selecciona al menos tu estado de ánimo para continuar
                 </p>
               )}
             </div>
           </motion.div>
         ) : (
-          /* ─── Results ─── */
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -236,19 +236,18 @@ export default function SuggestionsPage() {
           >
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-24 gap-4">
-                <Loader2 className="w-10 h-10 text-brand-blue-500 animate-spin" />
-                <p className="text-surface-500 font-medium">Encontrando el plan perfecto…</p>
+                <Loader2 className="w-10 h-10 text-brand-blue-500 dark:text-brand-blue-400 animate-spin" />
+                <p className="text-surface-500 dark:text-surface-400 font-medium">Encontrando el plan perfecto…</p>
               </div>
             ) : (
               <>
-                {/* Result header */}
-                <div className="bg-white rounded-3xl shadow-card p-6 mb-8 flex items-center justify-between gap-4">
+                <div className="bg-white dark:bg-surface-800 rounded-3xl shadow-card dark:shadow-card-dark p-6 mb-8 flex items-center justify-between gap-4">
                   <div>
                     <div className="badge-blue mb-2">Tus sugerencias</div>
-                    <h2 className="text-xl font-display font-bold text-surface-900">
+                    <h2 className="text-xl font-display font-bold text-surface-900 dark:text-surface-50">
                       {data?.meta.text}
                     </h2>
-                    <p className="text-sm text-surface-500 mt-1">
+                    <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
                       {data?.meta.totalResults} recomendaciones encontradas
                     </p>
                   </div>
@@ -261,11 +260,10 @@ export default function SuggestionsPage() {
                   </button>
                 </div>
 
-                {/* Events */}
                 {data && data.events.length > 0 && (
                   <div className="mb-12">
-                    <h3 className="text-xl font-display font-bold text-surface-900 mb-6 flex items-center gap-2">
-                      🎭 Eventos recomendados
+                    <h3 className="text-xl font-display font-bold text-surface-900 dark:text-surface-50 mb-6 flex items-center gap-2">
+                      <Theater className="w-5 h-5 text-brand-blue-500" /> Eventos recomendados
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {data.events.map((event) => (
@@ -275,11 +273,10 @@ export default function SuggestionsPage() {
                   </div>
                 )}
 
-                {/* Places */}
                 {data && data.places.length > 0 && (
                   <div>
-                    <h3 className="text-xl font-display font-bold text-surface-900 mb-6 flex items-center gap-2">
-                      📍 Lugares recomendados
+                    <h3 className="text-xl font-display font-bold text-surface-900 dark:text-surface-50 mb-6 flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-brand-green-500" /> Lugares recomendados
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {data.places.map((place) => (
@@ -291,9 +288,11 @@ export default function SuggestionsPage() {
 
                 {data && data.events.length === 0 && data.places.length === 0 && (
                   <div className="text-center py-20">
-                    <div className="text-6xl mb-4">🤔</div>
-                    <h3 className="text-xl font-bold text-surface-900 mb-2">Sin resultados exactos</h3>
-                    <p className="text-surface-500 mb-6">Prueba con otros filtros</p>
+                    <div className="w-16 h-16 rounded-2xl bg-surface-100 dark:bg-surface-800 flex items-center justify-center mx-auto mb-4">
+                      <HelpCircle className="w-8 h-8 text-surface-400 dark:text-surface-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-surface-900 dark:text-surface-50 mb-2">Sin resultados exactos</h3>
+                    <p className="text-surface-500 dark:text-surface-400 mb-6">Prueba con otros filtros</p>
                     <button onClick={handleReset} className="btn-primary">
                       <RefreshCw className="w-4 h-4" />
                       Intentar de nuevo

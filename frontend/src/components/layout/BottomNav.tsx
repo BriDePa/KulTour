@@ -1,7 +1,8 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Compass, Map, Sparkles, User, Home } from "lucide-react";
+import { Compass, Map, Sparkles, User, Home, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUnreadCount } from "@/hooks/useNotifications";
 
 const navItems = [
   { to: "/",            icon: Home,     label: "Inicio",   exact: true  },
@@ -13,6 +14,7 @@ const navItems = [
 
 export default function BottomNav() {
   const location = useLocation();
+  const unreadCount = useUnreadCount();
 
   return (
     <nav className="bottom-nav md:hidden">
@@ -31,7 +33,6 @@ export default function BottomNav() {
                 isActive && "active"
               )}
             >
-              {/* Active background pill */}
               <AnimatePresence>
                 {isActive && (
                   <motion.div
@@ -45,13 +46,20 @@ export default function BottomNav() {
                 )}
               </AnimatePresence>
 
-              <Icon
-                className={cn(
-                  "w-[22px] h-[22px] transition-all duration-200",
-                  isActive ? "text-brand-blue-500" : "text-surface-400"
+              <div className="relative">
+                <Icon
+                  className={cn(
+                    "w-[22px] h-[22px] transition-all duration-200",
+                    isActive ? "text-brand-blue-500" : "text-surface-400"
+                  )}
+                  strokeWidth={isActive ? 2.5 : 1.8}
+                />
+                {to === "/profile" && unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
                 )}
-                strokeWidth={isActive ? 2.5 : 1.8}
-              />
+              </div>
               <span className={cn(
                 "text-[10px] leading-none font-semibold transition-colors duration-200",
                 isActive ? "text-brand-blue-500" : "text-surface-400"

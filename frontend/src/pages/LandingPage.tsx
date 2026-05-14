@@ -29,22 +29,9 @@ const stagger = {
 function HeroBlobs() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <motion.div
-        animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-brand-blue-400/20 to-brand-green-400/10 blur-3xl"
-      />
-      <motion.div
-        animate={{ x: [0, -20, 0], y: [0, 30, 0] }}
-        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-brand-orange-400/15 to-brand-blue-400/10 blur-3xl"
-      />
-      <motion.div
-        animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute top-[40%] left-[40%] w-[300px] h-[300px] rounded-full bg-brand-green-400/10 blur-3xl"
-      />
-      {/* Grid pattern overlay */}
+      <div className="absolute top-[-10%] right-[-5%] w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] rounded-full bg-gradient-to-br from-brand-blue-400/20 to-brand-green-400/10 blur-3xl" />
+      <div className="absolute bottom-[-20%] left-[-10%] w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] rounded-full bg-gradient-to-br from-brand-orange-400/15 to-brand-blue-400/10 blur-3xl" />
+      <div className="absolute top-[40%] left-[40%] w-[150px] sm:w-[300px] h-[150px] sm:h-[300px] rounded-full bg-brand-green-400/10 blur-3xl" />
       <div
         className="absolute inset-0 opacity-[0.025]"
         style={{
@@ -56,7 +43,7 @@ function HeroBlobs() {
 }
 
 // ─── Stat pill ────────────────────────────────────────────
-function StatPill({ icon: Icon, value, label, color }: any) {
+function StatPill({ icon: Icon, value, label, color }: { icon: any; value: string; label: string; color: string }) {
   return (
     <motion.div
       variants={fadeUp}
@@ -74,7 +61,7 @@ function StatPill({ icon: Icon, value, label, color }: any) {
 }
 
 // ─── Benefit card ─────────────────────────────────────────
-function BenefitCard({ icon: Icon, title, description, gradient, delay }: any) {
+function BenefitCard({ icon: Icon, title, description, gradient, delay }: { icon: any; title: string; description: string; gradient: string; delay: number }) {
   return (
     <motion.div
       custom={delay}
@@ -93,7 +80,7 @@ function BenefitCard({ icon: Icon, title, description, gradient, delay }: any) {
 }
 
 // ─── Step card ────────────────────────────────────────────
-function StepCard({ number, title, description, delay }: any) {
+function StepCard({ number, title, description, delay }: { number: string; title: string; description: string; delay: number }) {
   return (
     <motion.div custom={delay} variants={fadeUp} className="flex gap-5">
       <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-blue-500 to-brand-blue-700 text-white font-display font-bold text-lg flex items-center justify-center shadow-soft">
@@ -188,7 +175,7 @@ export default function LandingPage() {
             className="inline-flex items-center gap-2 bg-brand-blue-50 border border-brand-blue-100 text-brand-blue-600 text-sm font-semibold px-4 py-2 rounded-full mb-8"
           >
             <span className="w-2 h-2 rounded-full bg-brand-green-500 animate-pulse" />
-            La Paz, Bolivia 🏔️ · 3600 msnm
+            La Paz, Bolivia · 3600 msnm
           </motion.div>
 
           {/* Headline */}
@@ -662,7 +649,7 @@ export default function LandingPage() {
             </div>
             Kultour
           </div>
-          <p className="text-surface-500 text-sm">© 2024 Kultour — La Paz, Bolivia 🏔️</p>
+          <p className="text-surface-500 text-sm">© 2024 Kultour — La Paz, Bolivia</p>
         </div>
       </footer>
     </div>

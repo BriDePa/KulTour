@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { eventsService, placesService, suggestionsService, citiesService } from "@/services/api.service";
+import { eventsService, placesService, suggestionsService, citiesService, searchService, uploadService } from "@/services/api.service";
 import type { EventFilters, PlaceFilters, SuggestionQuery, CreateEventForm } from "@/types";
 
 // ─── Events Hooks ─────────────────────────────────────────
@@ -88,5 +88,27 @@ export function useCities() {
     queryKey: ["cities"],
     queryFn: citiesService.getAll,
     staleTime: 1000 * 60 * 60,
+  });
+}
+
+// ─── Search Hook ───────────────────────────────────────────
+export function useSearch(query: string, enabled = true) {
+  return useQuery({
+    queryKey: ["search", query],
+    queryFn: () => searchService.global(query),
+    enabled: enabled && query.trim().length >= 2,
+    staleTime: 1000 * 60,
+  });
+}
+
+// ─── Upload Hook ────────────────────────────────────────────
+export function useUpload() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (file: File) => uploadService.image(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["places"] });
+    },
   });
 }

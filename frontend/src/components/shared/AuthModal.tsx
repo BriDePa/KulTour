@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Mail, Lock, User, Eye, EyeOff, Loader2, Compass, ArrowRight } from "lucide-react";
+import { X, Mail, Lock, User, Eye, EyeOff, Loader2, Compass, ArrowRight, Sparkles } from "lucide-react";
 import { create } from "zustand";
 import { authService } from "@/services/api.service";
 import { useAuthStore } from "@/store/authStore";
 import { useToastStore } from "@/store/toastStore";
 import { cn } from "@/lib/utils";
-import { useNavigate } from "react-router-dom";
 
-// ─── Auth Modal Store ─────────────────────────────────────
 interface AuthModalStore {
   isOpen: boolean;
   mode: "login" | "register";
@@ -25,7 +23,6 @@ export const useAuthModal = create<AuthModalStore>((set) => ({
   setMode: (mode) => set({ mode }),
 }));
 
-// ─── Input Field ──────────────────────────────────────────
 function AuthInput({
   icon: Icon, type = "text", placeholder, value, onChange, error,
   rightElement,
@@ -37,7 +34,7 @@ function AuthInput({
   return (
     <div>
       <div className="relative">
-        <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 pointer-events-none" />
+        <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 dark:text-surface-500 pointer-events-none" />
         <input
           type={type}
           value={value}
@@ -45,7 +42,7 @@ function AuthInput({
           placeholder={placeholder}
           className={cn(
             "input-base pl-10 pr-10",
-            error && "border-red-400 focus:border-red-400 focus:ring-red-400/10"
+            error && "border-red-400 dark:border-red-500 focus:border-red-400 dark:focus:border-red-400 focus:ring-red-400/10 dark:focus:ring-red-500/20"
           )}
         />
         {rightElement && (
@@ -54,12 +51,11 @@ function AuthInput({
           </div>
         )}
       </div>
-      {error && <p className="text-red-500 text-xs mt-1.5 pl-1">{error}</p>}
+      {error && <p className="text-red-500 dark:text-red-400 text-xs mt-1.5 pl-1">{error}</p>}
     </div>
   );
 }
 
-// ─── Login Form ───────────────────────────────────────────
 function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
@@ -69,7 +65,6 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
 
   const { setAuth } = useAuthStore();
   const { success, error: toastError } = useToastStore();
-  const navigate = useNavigate();
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -84,18 +79,34 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
+    setErrors({});
+    
     try {
       const { user, token } = await authService.login({ email, password });
       setAuth(user, token);
-      success("¡Bienvenido!", `Hola de nuevo, ${user.name.split(" ")[0]} 👋`);
+      success("Bienvenido", `Hola de nuevo, ${user.name.split(" ")[0]}`);
       onSuccess();
-      if (user.role === "ORGANIZER" || user.role === "ADMIN") {
-        navigate("/dashboard");
-      }
     } catch (err: any) {
-      const msg = err?.response?.data?.message || "Email o contraseña incorrectos";
-      toastError("Error al ingresar", msg);
-      setErrors({ general: msg });
+      console.error("[Login Error]", err);
+      
+      // Manejar diferentes tipos de errores
+      if (err.isNetworkError) {
+        toastError("Sin conexión", "No se pudo conectar con el servidor. Verifica que el backend esté activo.");
+        setErrors({ general: "Servidor no disponible" });
+      } else {
+        const status = err.response?.status;
+        const message = err.response?.data?.message || "Error al iniciar sesión";
+        
+        if (status === 401) {
+          setErrors({ general: "Email o contraseña incorrectos" });
+          toastError("Credenciales incorrectas", message);
+        } else if (status === 404) {
+          setErrors({ general: "Usuario no encontrado" });
+        } else {
+          setErrors({ general: message });
+          toastError("Error", message);
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -113,13 +124,13 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
         value={password} onChange={setPassword} error={errors.password}
         rightElement={
           <button type="button" onClick={() => setShowPass(!showPass)}
-            className="text-surface-400 hover:text-surface-600 transition-colors">
+            className="text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300 transition-colors">
             {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         }
       />
       {errors.general && (
-        <p className="text-red-500 text-sm text-center bg-red-50 py-2 rounded-xl">
+        <p className="text-red-500 dark:text-red-400 text-sm text-center bg-red-50 dark:bg-red-900/20 py-2 rounded-xl">
           {errors.general}
         </p>
       )}
@@ -135,17 +146,11 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
         )}
       </button>
 
-      {/* Demo accounts hint */}
-      <div className="bg-surface-50 rounded-2xl p-3 text-xs text-surface-500 space-y-1">
-        <p className="font-semibold text-surface-700 mb-1.5">Cuentas de prueba:</p>
-        <p>👤 Usuario: <span className="font-mono">juan@gmail.com</span> / <span className="font-mono">user123</span></p>
-        <p>🎭 Organizador: <span className="font-mono">eventos@noche.bo</span> / <span className="font-mono">organizer123</span></p>
-      </div>
+
     </form>
   );
 }
 
-// ─── Register Form ────────────────────────────────────────
 function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
   const [name, setName]         = useState("");
   const [email, setEmail]       = useState("");
@@ -174,7 +179,7 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
     try {
       const { user, token } = await authService.register({ name, email, password, role });
       setAuth(user, token);
-      success("¡Cuenta creada!", `Bienvenido a Kultour, ${user.name.split(" ")[0]} 🎉`);
+      success("¡Cuenta creada!", `Bienvenido a Kultour, ${user.name.split(" ")[0]}`);
       onSuccess();
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Error al crear la cuenta";
@@ -200,34 +205,33 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
         value={password} onChange={setPassword} error={errors.password}
         rightElement={
           <button type="button" onClick={() => setShowPass(!showPass)}
-            className="text-surface-400 hover:text-surface-600 transition-colors">
+            className="text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300 transition-colors">
             {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         }
       />
 
-      {/* Role selector */}
       <div>
-        <p className="text-sm font-semibold text-surface-700 mb-2">¿Cómo vas a usar Kultour?</p>
+        <p className="text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">¿Cómo vas a usar Kultour?</p>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { value: "USER",      label: "Explorador",   emoji: "🧭", desc: "Descubro eventos" },
-            { value: "ORGANIZER", label: "Organizador",  emoji: "🎭", desc: "Creo eventos" },
+            { value: "USER",      label: "Explorador",   icon: Compass, desc: "Descubro eventos" },
+            { value: "ORGANIZER", label: "Organizador",  icon: Sparkles, desc: "Creo eventos" },
           ].map((opt) => (
             <button
               key={opt.value}
               type="button"
               onClick={() => setRole(opt.value as any)}
               className={cn(
-                "flex flex-col items-center gap-1 p-3 rounded-2xl border-2 text-sm transition-all duration-200",
+                "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 text-sm transition-all duration-200",
                 role === opt.value
-                  ? "border-brand-blue-400 bg-brand-blue-50"
-                  : "border-surface-200 hover:border-brand-blue-200"
+                  ? "border-brand-blue-400 dark:border-brand-blue-500 bg-brand-blue-50 dark:bg-brand-blue-900/30"
+                  : "border-surface-200 dark:border-surface-700 hover:border-brand-blue-200 dark:hover:border-brand-blue-700"
               )}
             >
-              <span className="text-2xl">{opt.emoji}</span>
-              <span className="font-semibold text-surface-900">{opt.label}</span>
-              <span className="text-xs text-surface-500">{opt.desc}</span>
+              <opt.icon className={cn("w-6 h-6", role === opt.value ? "text-brand-blue-500" : "text-surface-500 dark:text-surface-400")} />
+              <span className="font-semibold text-surface-900 dark:text-surface-100">{opt.label}</span>
+              <span className="text-xs text-surface-500 dark:text-surface-400">{opt.desc}</span>
             </button>
           ))}
         </div>
@@ -248,7 +252,6 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-// ─── Main Modal ───────────────────────────────────────────
 export default function AuthModal() {
   const { isOpen, mode, close, setMode } = useAuthModal();
 
@@ -256,7 +259,6 @@ export default function AuthModal() {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
@@ -266,7 +268,6 @@ export default function AuthModal() {
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70]"
           />
 
-          {/* Modal */}
           <motion.div
             key="modal"
             initial={{ opacity: 0, y: 60, scale: 0.95 }}
@@ -275,33 +276,31 @@ export default function AuthModal() {
             transition={{ type: "spring", damping: 24, stiffness: 280 }}
             className="fixed inset-x-4 bottom-0 sm:inset-auto sm:top-[10%] sm:left-[35%] sm:-translate-x-1/2 sm:-translate-y-1/2 z-[71] w-auto sm:w-full sm:max-w-md"
           >
-            <div className="bg-white rounded-t-4xl sm:rounded-3xl shadow-card-hover overflow-hidden">
-              {/* Header */}
+            <div className="bg-white dark:bg-surface-800 rounded-t-4xl sm:rounded-3xl shadow-card-hover dark:shadow-card-hover-dark overflow-hidden">
               <div className="flex items-center justify-between px-6 pt-6 pb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-blue-500 to-brand-green-500 flex items-center justify-center">
                     <Compass className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-display font-bold text-surface-900">
+                    <h2 className="text-lg font-display font-bold text-surface-900 dark:text-surface-50">
                       {mode === "login" ? "Bienvenido" : "Únete a Kultour"}
                     </h2>
-                    <p className="text-xs text-surface-500">
+                    <p className="text-xs text-surface-500 dark:text-surface-400">
                       {mode === "login" ? "Ingresa a tu cuenta" : "Crea tu cuenta gratis"}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={close}
-                  className="touch-target text-surface-400 hover:text-surface-700 transition-colors"
+                  className="touch-target text-surface-400 dark:text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Tab switcher */}
               <div className="px-6 mb-5">
-                <div className="bg-surface-100 rounded-2xl p-1 flex">
+                <div className="bg-surface-100 dark:bg-surface-700 rounded-2xl p-1 flex">
                   {(["login", "register"] as const).map((m) => (
                     <button
                       key={m}
@@ -309,8 +308,8 @@ export default function AuthModal() {
                       className={cn(
                         "flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
                         mode === m
-                          ? "bg-white text-surface-900 shadow-soft"
-                          : "text-surface-500 hover:text-surface-700"
+                          ? "bg-white dark:bg-surface-600 text-surface-900 dark:text-surface-50 shadow-soft"
+                          : "text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200"
                       )}
                     >
                       {m === "login" ? "Ingresar" : "Registrarse"}
@@ -319,7 +318,6 @@ export default function AuthModal() {
                 </div>
               </div>
 
-              {/* Forms */}
               <div className="px-6 pb-6">
                 <AnimatePresence mode="wait">
                   <motion.div

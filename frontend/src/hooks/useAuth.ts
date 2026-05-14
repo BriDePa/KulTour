@@ -14,7 +14,7 @@ export function useLogin() {
     mutationFn: (data: LoginForm) => authService.login(data),
     onSuccess: ({ user, token }) => {
       setAuth(user, token);
-      success("¡Bienvenido!", `Hola de nuevo, ${user.name.split(" ")[0]} 👋`);
+      success("¡Bienvenido!", `Hola de nuevo, ${user.name.split(" ")[0]}`);
       if (user.role === "ORGANIZER" || user.role === "ADMIN") {
         navigate("/dashboard");
       } else {
@@ -22,9 +22,10 @@ export function useLogin() {
       }
     },
     onError: (err: any) => {
+      console.error("[useLogin] Error:", err.response?.data);
       toastError(
         "Error al ingresar",
-        err?.response?.data?.message || "Email o contraseña incorrectos"
+        err?.response?.data?.message || err?.response?.data?.code || "Email o contraseña incorrectos"
       );
     },
   });
@@ -39,7 +40,7 @@ export function useRegister() {
     mutationFn: (data: RegisterForm) => authService.register(data),
     onSuccess: ({ user, token }) => {
       setAuth(user, token);
-      success("¡Cuenta creada!", `Bienvenido a Kultour, ${user.name.split(" ")[0]} 🎉`);
+      success("¡Cuenta creada!", `Bienvenido a Kultour, ${user.name.split(" ")[0]}`);
       navigate("/explore");
     },
     onError: (err: any) => {
@@ -58,7 +59,7 @@ export function useLogout() {
 
   return () => {
     clearAuth();
-    info("Sesión cerrada", "Hasta pronto 👋");
+    info("Sesión cerrada", "Hasta pronto");
     navigate("/");
   };
 }

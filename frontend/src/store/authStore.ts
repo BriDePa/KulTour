@@ -25,7 +25,6 @@ export const useAuthStore = create<AuthState>()(
 
       clearAuth: () => {
         localStorage.removeItem("kultour_token");
-        localStorage.removeItem("kultour_user");
         set({ user: null, token: null, isAuthenticated: false });
       },
 

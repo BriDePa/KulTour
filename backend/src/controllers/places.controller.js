@@ -1,5 +1,8 @@
 const prisma = require("../lib/prisma");
 
+const ALLOWED_PLACE_SORT = ["rating", "name", "createdAt"];
+const ALLOWED_ORDER = ["asc", "desc"];
+
 const getPlaces = async (req, res, next) => {
   try {
     const {
@@ -13,6 +16,8 @@ const getPlaces = async (req, res, next) => {
       order = "desc",
     } = req.query;
 
+    const safeSortBy = ALLOWED_PLACE_SORT.includes(sortBy) ? sortBy : "rating";
+    const safeOrder = ALLOWED_ORDER.includes(order) ? order : "desc";
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const where = {};
@@ -33,7 +38,7 @@ const getPlaces = async (req, res, next) => {
         where,
         skip,
         take: parseInt(limit),
-        orderBy: { [sortBy]: order },
+        orderBy: { [safeSortBy]: safeOrder },
         include: {
           city: { select: { name: true } },
           owner: { select: { id: true, name: true } },

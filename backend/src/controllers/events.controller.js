@@ -1,5 +1,8 @@
 const prisma = require("../lib/prisma");
 
+const ALLOWED_EVENT_SORT = ["date", "title", "price", "createdAt"];
+const ALLOWED_ORDER = ["asc", "desc"];
+
 const getEvents = async (req, res, next) => {
   try {
     const {
@@ -14,6 +17,8 @@ const getEvents = async (req, res, next) => {
       order = "asc",
     } = req.query;
 
+    const safeSortBy = ALLOWED_EVENT_SORT.includes(sortBy) ? sortBy : "date";
+    const safeOrder = ALLOWED_ORDER.includes(order) ? order : "asc";
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const where = {
@@ -38,7 +43,7 @@ const getEvents = async (req, res, next) => {
         where,
         skip,
         take: parseInt(limit),
-        orderBy: { [sortBy]: order },
+        orderBy: { [safeSortBy]: safeOrder },
         include: {
           city: { select: { name: true } },
           organizer: { select: { id: true, name: true, avatar: true } },
@@ -172,12 +177,32 @@ const updateEvent = async (req, res, next) => {
       return res.status(403).json({ success: false, message: "Sin permisos" });
     }
 
+    const {
+      title, description, imageUrl, date, endDate, price, isFree,
+      capacity, venue, address, latitude, longitude, tags,
+      category, ticketUrl, status, cityId,
+    } = req.body;
+
     const updated = await prisma.event.update({
       where: { id },
       data: {
-        ...req.body,
-        date: req.body.date ? new Date(req.body.date) : undefined,
-        endDate: req.body.endDate ? new Date(req.body.endDate) : undefined,
+        ...(title !== undefined && { title }),
+        ...(description !== undefined && { description }),
+        ...(imageUrl !== undefined && { imageUrl }),
+        ...(date !== undefined && { date: new Date(date) }),
+        ...(endDate !== undefined && { endDate: endDate ? new Date(endDate) : null }),
+        ...(price !== undefined && { price }),
+        ...(isFree !== undefined && { isFree }),
+        ...(capacity !== undefined && { capacity: capacity ? parseInt(capacity) : null }),
+        ...(venue !== undefined && { venue }),
+        ...(address !== undefined && { address }),
+        ...(latitude !== undefined && { latitude: latitude ? parseFloat(latitude) : null }),
+        ...(longitude !== undefined && { longitude: longitude ? parseFloat(longitude) : null }),
+        ...(tags !== undefined && { tags }),
+        ...(category !== undefined && { category }),
+        ...(ticketUrl !== undefined && { ticketUrl }),
+        ...(status !== undefined && req.user.role === "ADMIN" && { status }),
+        ...(cityId !== undefined && req.user.role === "ADMIN" && { cityId }),
       },
       include: {
         city: { select: { name: true } },

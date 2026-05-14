@@ -86,6 +86,7 @@ export default defineConfig({
 
       // ─── Workbox — Estrategias de caché ───────────────────
       workbox: {
+        navigateFallback: "/index.html",
         // Cachea todos los assets del build
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
 

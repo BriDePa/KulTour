@@ -1,17 +1,18 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Tag, Users, ArrowUpRight, Clock } from "lucide-react";
+import { Calendar, MapPin, Tag, ArrowUpRight, Clock, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatShortDate, formatTime, formatPrice, truncate, cn } from "@/lib/utils";
 import type { Event } from "@/types";
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "Música":        "bg-brand-blue-50 text-brand-blue-600",
-  "Arte y Cultura":"bg-violet-50 text-violet-600",
-  "Gastronomía":   "bg-amber-50 text-amber-600",
-  "Noche":         "bg-surface-800 text-white",
-  "Turismo":       "bg-brand-green-50 text-brand-green-600",
-  "Deportes":      "bg-red-50 text-red-600",
-  "Familiar":      "bg-pink-50 text-pink-600",
+  "Música":        "bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-600 dark:text-brand-blue-400",
+  "Arte y Cultura":"bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
+  "Gastronomía":   "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
+  "Noche":         "bg-surface-800 dark:bg-surface-700 text-white dark:text-surface-100",
+  "Turismo":       "bg-brand-green-50 dark:bg-brand-green-900/30 text-brand-green-600 dark:text-brand-green-400",
+  "Deportes":      "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400",
+  "Familiar":      "bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400",
 };
 
 interface EventCardProps {
@@ -19,8 +20,8 @@ interface EventCardProps {
   compact?: boolean;
 }
 
-export default function EventCard({ event, compact = false }: EventCardProps) {
-  const categoryColor = CATEGORY_COLORS[event.category || ""] || "bg-surface-100 text-surface-600";
+export const EventCard = memo(function EventCard({ event, compact = false }: EventCardProps) {
+  const categoryColor = CATEGORY_COLORS[event.category || ""] || "bg-surface-100 dark:bg-surface-700 text-surface-600 dark:text-surface-400";
   const eventDate = new Date(event.date);
   const dayNumber = eventDate.toLocaleDateString("es-BO", { day: "numeric" });
   const monthShort = eventDate.toLocaleDateString("es-BO", { month: "short" });
@@ -49,23 +50,23 @@ export default function EventCard({ event, compact = false }: EventCardProps) {
 
           {/* Featured badge */}
           {event.featured && (
-            <div className="absolute top-3 left-3 badge bg-brand-orange-500 text-white text-xs font-bold shadow-soft">
-              ⭐ Destacado
+            <div className="absolute top-3 left-3 badge bg-brand-orange-500 text-white text-xs font-bold shadow-soft flex items-center gap-1">
+              <Star className="w-3 h-3 fill-current" /> Destacado
             </div>
           )}
 
           {/* Price badge */}
           <div className={cn(
             "absolute top-3 right-3 px-3 py-1.5 rounded-xl text-sm font-bold shadow-soft",
-            event.isFree ? "bg-brand-green-500 text-white" : "bg-white text-surface-900"
+            event.isFree ? "bg-brand-green-500 text-white" : "bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100"
           )}>
             {formatPrice(event.price, event.isFree)}
           </div>
 
           {/* Date pill */}
-          <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm rounded-xl px-3 py-2 text-center shadow-soft min-w-[52px]">
-            <div className="text-lg font-bold font-display text-brand-blue-600 leading-none">{dayNumber}</div>
-            <div className="text-xs text-surface-500 font-medium uppercase tracking-wide">{monthShort}</div>
+          <div className="absolute bottom-3 left-3 bg-white/95 dark:bg-surface-800/95 backdrop-blur-sm rounded-xl px-3 py-2 text-center shadow-soft min-w-[52px]">
+            <div className="text-lg font-bold font-display text-brand-blue-600 dark:text-brand-blue-400 leading-none">{dayNumber}</div>
+            <div className="text-xs text-surface-500 dark:text-surface-400 font-medium uppercase tracking-wide">{monthShort}</div>
           </div>
         </div>
 
@@ -79,28 +80,28 @@ export default function EventCard({ event, compact = false }: EventCardProps) {
           )}
 
           {/* Title */}
-          <h3 className="font-display font-bold text-surface-900 text-lg leading-snug mb-2 group-hover:text-brand-blue-600 transition-colors">
+          <h3 className="font-display font-bold text-surface-900 dark:text-surface-50 text-lg leading-snug mb-2 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors">
             {compact ? truncate(event.title, 55) : event.title}
           </h3>
 
           {/* Description */}
           {!compact && (
-            <p className="text-surface-500 text-sm leading-relaxed mb-4 flex-1">
+            <p className="text-surface-500 dark:text-surface-400 text-sm leading-relaxed mb-4 flex-1">
               {truncate(event.description, 100)}
             </p>
           )}
 
           {/* Meta */}
           <div className="mt-auto space-y-2">
-            <div className="flex items-center gap-2 text-xs text-surface-500">
+            <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
               <Clock className="w-3.5 h-3.5 flex-shrink-0" />
               <span>{formatTime(event.date)}</span>
-              <span className="text-surface-300">·</span>
+              <span className="text-surface-300 dark:text-surface-600">·</span>
               <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
               <span className="truncate">{event.venue}</span>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-surface-500">
+            <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
               <Tag className="w-3.5 h-3.5 flex-shrink-0" />
               <span className="truncate">
                 {event.tags.slice(0, 3).join(" · ")}
@@ -109,16 +110,16 @@ export default function EventCard({ event, compact = false }: EventCardProps) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-surface-100">
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-surface-100 dark:border-surface-700">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-blue-400 to-brand-green-400 flex items-center justify-center text-white text-xs font-bold">
                 {event.organizer.name.charAt(0)}
               </div>
-              <span className="text-xs text-surface-500 font-medium">
+              <span className="text-xs text-surface-500 dark:text-surface-400 font-medium">
                 {truncate(event.organizer.name, 20)}
               </span>
             </div>
-            <div className="flex items-center gap-1 text-brand-blue-500 text-xs font-semibold group-hover:gap-2 transition-all">
+            <div className="flex items-center gap-1 text-brand-blue-500 dark:text-brand-blue-400 text-xs font-semibold group-hover:gap-2 transition-all">
               Ver más
               <ArrowUpRight className="w-3.5 h-3.5" />
             </div>
@@ -127,4 +128,6 @@ export default function EventCard({ event, compact = false }: EventCardProps) {
       </motion.article>
     </Link>
   );
-}
+});
+
+export default EventCard;

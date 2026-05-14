@@ -189,3 +189,49 @@ export interface CreateEventForm {
   ticketUrl?: string;
   cityId: string;
 }
+
+// ─── Favorites ─────────────────────────────────────────────
+export interface Favorite {
+  id: string;
+  userId: string;
+  eventId?: string;
+  placeId?: string;
+  event?: Event;
+  place?: Place;
+  createdAt: string;
+}
+
+// ─── Reviews ───────────────────────────────────────────────
+export interface Review {
+  id: string;
+  userId: string;
+  placeId: string;
+  rating: number;
+  comment: string;
+  user: { id: string; name: string; avatar?: string };
+  createdAt: string;
+}
+
+// ─── Notifications ─────────────────────────────────────────
+export interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+}
+
+// ─── Search ────────────────────────────────────────────────
+export interface SearchResult {
+  events: Event[];
+  places: Place[];
+  total: number;
+}
+
+// ─── Profile Update ────────────────────────────────────────
+export interface UpdateProfileForm {
+  name?: string;
+  bio?: string;
+  avatar?: string;
+}

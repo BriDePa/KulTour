@@ -11,7 +11,7 @@ const os   = require("os");
 const fs   = require("fs");
 const path = require("path");
 
-const FRONTEND_ENV = path.join(__dirname, "../frontend/.env");
+const FRONTEND_ENV = path.join(__dirname, "frontend/.env");
 
 function getLocalIPs() {
   const nets = os.networkInterfaces();

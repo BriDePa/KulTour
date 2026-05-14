@@ -1,13 +1,12 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, SlidersHorizontal, X, Calendar, MapPin, Tag, ChevronDown } from "lucide-react";
+import { Search, SlidersHorizontal, X, Calendar, MapPin, Tag, ChevronDown, CalendarDays } from "lucide-react";
 import { useEvents, usePlaces } from "@/hooks/useKultour";
 import EventCard from "@/components/shared/EventCard";
 import PlaceCard from "@/components/shared/PlaceCard";
 import { cn, EVENT_CATEGORIES, PLACE_CATEGORY_LABELS } from "@/lib/utils";
 import type { EventFilters, PlaceFilters, PlaceCategory } from "@/types";
 
-// ─── Filter Pill ─────────────────────────────────────────
 function FilterPill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
     <button
@@ -15,8 +14,8 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
       className={cn(
         "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap border",
         active
-          ? "bg-brand-blue-500 text-white border-brand-blue-500 shadow-glow"
-          : "bg-white text-surface-600 border-surface-200 hover:border-brand-blue-300 hover:text-brand-blue-600"
+          ? "bg-brand-blue-500 text-white border-brand-blue-500 shadow-glow dark:shadow-glow-dark"
+          : "bg-white dark:bg-surface-800 text-surface-600 dark:text-surface-400 border-surface-200 dark:border-surface-700 hover:border-brand-blue-300 dark:hover:border-brand-blue-600 hover:text-brand-blue-600 dark:hover:text-brand-blue-400"
       )}
     >
       {label}
@@ -24,7 +23,6 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
   );
 }
 
-// ─── Skeleton grid ────────────────────────────────────────
 function SkeletonGrid({ count = 6 }: { count?: number }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -35,15 +33,20 @@ function SkeletonGrid({ count = 6 }: { count?: number }) {
   );
 }
 
-// ─── Empty state ─────────────────────────────────────────
 function EmptyState({ tab }: { tab: string }) {
   return (
     <div className="text-center py-24">
-      <div className="text-6xl mb-4">{tab === "events" ? "🗓️" : "📍"}</div>
-      <h3 className="text-xl font-display font-bold text-surface-900 mb-2">
+      <div className="w-16 h-16 rounded-2xl bg-brand-blue-50 dark:bg-brand-blue-900/30 flex items-center justify-center mx-auto mb-4">
+        {tab === "events" ? (
+          <CalendarDays className="w-8 h-8 text-brand-blue-500" />
+        ) : (
+          <MapPin className="w-8 h-8 text-brand-green-500" />
+        )}
+      </div>
+      <h3 className="text-xl font-display font-bold text-surface-900 dark:text-surface-50 mb-2">
         Sin resultados
       </h3>
-      <p className="text-surface-500 text-sm">
+      <p className="text-surface-500 dark:text-surface-400 text-sm">
         Intenta con otros filtros o términos de búsqueda
       </p>
     </div>
@@ -58,12 +61,12 @@ export default function ExplorePage() {
   const [eventCategory, setEventCategory] = useState<string>("");
   const [placeCategory, setPlaceCategory] = useState<string>("");
   const [isFree, setIsFree] = useState(false);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Debounce search
   const handleSearch = useCallback((val: string) => {
     setSearch(val);
-    clearTimeout((window as any).__searchTimeout);
-    (window as any).__searchTimeout = setTimeout(() => setDebouncedSearch(val), 400);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => setDebouncedSearch(val), 400);
   }, []);
 
   const eventFilters: EventFilters = {
@@ -92,7 +95,7 @@ export default function ExplorePage() {
   return (
     <div className="min-h-screen">
       {/* ─── Header ────────────────────────────────────────── */}
-      <div className="bg-gradient-to-br from-brand-blue-600 to-brand-blue-800 pt-10 pb-16">
+      <div className="bg-gradient-to-br from-brand-blue-600 to-brand-blue-800 dark:from-brand-blue-700 dark:to-surface-900 pt-10 pb-16">
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -102,7 +105,7 @@ export default function ExplorePage() {
             <h1 className="text-4xl lg:text-5xl font-display font-bold text-white mb-3">
               Explorar La Paz
             </h1>
-            <p className="text-white/70 text-lg mb-8">
+            <p className="text-white/70 dark:text-white/60 text-lg mb-8">
               Descubre eventos y lugares únicos en la ciudad más alta del mundo
             </p>
 
@@ -114,12 +117,12 @@ export default function ExplorePage() {
                 placeholder={activeTab === "events" ? "Buscar eventos..." : "Buscar lugares..."}
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="w-full bg-white border-0 rounded-2xl pl-12 pr-12 py-4 text-surface-900 placeholder:text-surface-400 outline-none shadow-card-hover text-base"
+                className="w-full bg-white dark:bg-surface-800 border-0 rounded-2xl pl-12 pr-12 py-4 text-surface-900 dark:text-surface-100 placeholder:text-surface-400 dark:placeholder:text-surface-500 outline-none shadow-card-hover dark:shadow-card-hover-dark text-base"
               />
               {search && (
                 <button
                   onClick={() => { setSearch(""); setDebouncedSearch(""); }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-700 dark:hover:text-surface-300 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -131,14 +134,14 @@ export default function ExplorePage() {
 
       <div className="section-container -mt-6">
         {/* ─── Tabs card ──────────────────────────────────── */}
-        <div className="bg-white rounded-3xl shadow-card p-2 flex gap-2 mb-8 inline-flex">
+        <div className="bg-white dark:bg-surface-800 rounded-3xl shadow-card dark:shadow-card-dark p-2 flex gap-2 mb-8 inline-flex">
           <button
             onClick={() => setActiveTab("events")}
             className={cn(
               "flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-semibold transition-all duration-200",
               activeTab === "events"
                 ? "bg-brand-blue-500 text-white shadow-soft"
-                : "text-surface-500 hover:text-surface-800"
+                : "text-surface-500 dark:text-surface-400 hover:text-surface-800 dark:hover:text-surface-100"
             )}
           >
             <Calendar className="w-4 h-4" />
@@ -146,7 +149,7 @@ export default function ExplorePage() {
             {eventTotal > 0 && (
               <span className={cn(
                 "text-xs px-2 py-0.5 rounded-full font-bold",
-                activeTab === "events" ? "bg-white/20 text-white" : "bg-surface-100 text-surface-600"
+                activeTab === "events" ? "bg-white/20 text-white" : "bg-surface-100 dark:bg-surface-700 text-surface-600 dark:text-surface-400"
               )}>
                 {eventTotal}
               </span>
@@ -158,7 +161,7 @@ export default function ExplorePage() {
               "flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-semibold transition-all duration-200",
               activeTab === "places"
                 ? "bg-brand-blue-500 text-white shadow-soft"
-                : "text-surface-500 hover:text-surface-800"
+                : "text-surface-500 dark:text-surface-400 hover:text-surface-800 dark:hover:text-surface-100"
             )}
           >
             <MapPin className="w-4 h-4" />
@@ -166,7 +169,7 @@ export default function ExplorePage() {
             {placeTotal > 0 && (
               <span className={cn(
                 "text-xs px-2 py-0.5 rounded-full font-bold",
-                activeTab === "places" ? "bg-white/20 text-white" : "bg-surface-100 text-surface-600"
+                activeTab === "places" ? "bg-white/20 text-white" : "bg-surface-100 dark:bg-surface-700 text-surface-600 dark:text-surface-400"
               )}>
                 {placeTotal}
               </span>
@@ -177,7 +180,6 @@ export default function ExplorePage() {
         {/* ─── Filters row ────────────────────────────────── */}
         <div className="flex items-center gap-3 mb-6 flex-wrap">
           <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
-            {/* Event category filters */}
             {activeTab === "events" && (
               <>
                 <FilterPill
@@ -194,14 +196,13 @@ export default function ExplorePage() {
                   />
                 ))}
                 <FilterPill
-                  label="Gratis 🎉"
+                  label="Gratis"
                   active={isFree}
                   onClick={() => setIsFree(!isFree)}
                 />
               </>
             )}
 
-            {/* Place category filters */}
             {activeTab === "places" && (
               <>
                 <FilterPill
@@ -221,7 +222,6 @@ export default function ExplorePage() {
             )}
           </div>
 
-          {/* Clear filters */}
           {hasActiveFilters && (
             <motion.button
               initial={{ opacity: 0, scale: 0.8 }}

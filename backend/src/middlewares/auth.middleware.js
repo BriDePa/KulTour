@@ -9,12 +9,37 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: "Token de acceso requerido",
+        code: "MISSING_TOKEN",
       });
     }
 
     const token = authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (jwtError) {
+      console.error("[AUTH MIDDLEWARE] Error verificando JWT:", jwtError.message);
+      if (jwtError.name === "TokenExpiredError") {
+        return res.status(401).json({
+          success: false,
+          message: "Token expirado",
+          code: "TOKEN_EXPIRED",
+        });
+      }
+      if (jwtError.name === "JsonWebTokenError") {
+        return res.status(401).json({
+          success: false,
+          message: "Token inválido",
+          code: "TOKEN_INVALID",
+        });
+      }
+      return res.status(401).json({
+        success: false,
+        message: "Error de autenticación",
+        code: "AUTH_ERROR",
+      });
+    }
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
@@ -25,16 +50,19 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: "Usuario no encontrado",
+        code: "USER_NOT_FOUND",
       });
     }
 
     req.user = user;
     next();
   } catch (error) {
-    if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ success: false, message: "Token expirado" });
-    }
-    return res.status(401).json({ success: false, message: "Token inválido" });
+    console.error("[AUTH MIDDLEWARE] Error general:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error interno de autenticación",
+      code: "INTERNAL_AUTH_ERROR",
+    });
   }
 };
 

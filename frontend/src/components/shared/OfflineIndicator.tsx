@@ -24,7 +24,6 @@ export default function OfflineIndicator() {
 
   return (
     <AnimatePresence>
-      {/* Offline */}
       {!isOnline && (
         <motion.div
           key="offline"
@@ -35,14 +34,13 @@ export default function OfflineIndicator() {
           className="fixed top-0 left-0 right-0 z-[70] flex justify-center"
           style={{ paddingTop: "var(--safe-top)" }}
         >
-          <div className="bg-surface-800 text-white px-5 py-2.5 rounded-b-2xl flex items-center gap-2 text-sm font-medium shadow-lg">
+          <div className="bg-surface-800 dark:bg-surface-950 text-white px-5 py-2.5 rounded-b-2xl flex items-center gap-2 text-sm font-medium shadow-lg">
             <WifiOff className="w-4 h-4 text-brand-orange-400" />
             Sin conexión — mostrando datos guardados
           </div>
         </motion.div>
       )}
 
-      {/* Reconnected */}
       {showReconnected && (
         <motion.div
           key="reconnected"

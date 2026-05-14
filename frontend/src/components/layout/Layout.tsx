@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useLogout } from "@/hooks/useAuth";
 import { useAuthModal } from "@/components/shared/AuthModal";
+import ThemeToggle from "@/components/shared/ThemeToggle";
 import { cn } from "@/lib/utils";
 import BottomNav from "./BottomNav";
 import GlobalSearch from "@/components/shared/GlobalSearch";
@@ -31,7 +32,7 @@ export default function Layout() {
     <div className="min-h-screen flex flex-col">
       {/* ─── Header ─────────────────────────────────────────── */}
       <header
-        className="sticky top-0 z-50 glass border-b border-white/60"
+        className="sticky top-0 z-50 glass border-b border-white/60 dark:border-surface-700/50"
         style={{ paddingTop: "var(--safe-top)" }}
       >
         <div className="section-container">
@@ -60,8 +61,8 @@ export default function Layout() {
                     cn(
                       "flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200",
                       isActive
-                        ? "bg-brand-blue-50 text-brand-blue-600"
-                        : "text-surface-600 hover:text-surface-900 hover:bg-surface-100"
+                        ? "bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-600 dark:text-brand-blue-400"
+                        : "text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-800"
                     )
                   }
                 >
@@ -76,8 +77,8 @@ export default function Layout() {
                     cn(
                       "flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200",
                       isActive
-                        ? "bg-brand-blue-50 text-brand-blue-600"
-                        : "text-surface-600 hover:text-surface-900 hover:bg-surface-100"
+                        ? "bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-600 dark:text-brand-blue-400"
+                        : "text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-800"
                     )
                   }
                 >
@@ -87,21 +88,23 @@ export default function Layout() {
               )}
             </nav>
 
-            {/* Desktop Auth */}
+            {/* Desktop: Theme toggle + Auth */}
             <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+              <ThemeToggle />
+
               {isAuthenticated ? (
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-surface-100 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-blue-400 to-brand-green-400 flex items-center justify-center text-white text-sm font-bold">
                       {user?.name?.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-sm font-medium text-surface-700 max-w-[80px] truncate">
+                    <span className="text-sm font-medium text-surface-700 dark:text-surface-300 max-w-[80px] truncate">
                       {user?.name?.split(" ")[0]}
                     </span>
-                    <ChevronDown className="w-3.5 h-3.5 text-surface-400" />
+                    <ChevronDown className="w-3.5 h-3.5 text-surface-400 dark:text-surface-500" />
                   </button>
                   <AnimatePresence>
                     {userMenuOpen && (
@@ -110,22 +113,22 @@ export default function Layout() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 4, scale: 0.96 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-card-hover border border-surface-100 overflow-hidden z-50"
+                        className="absolute right-0 mt-2 w-52 bg-white dark:bg-surface-800 rounded-2xl shadow-card-hover dark:shadow-card-hover-dark border border-surface-100 dark:border-surface-700 overflow-hidden z-50"
                       >
-                        <div className="p-3.5 border-b border-surface-100">
-                          <p className="text-sm font-semibold text-surface-900 truncate">{user?.name}</p>
-                          <p className="text-xs text-surface-500 truncate">{user?.email}</p>
+                        <div className="p-3.5 border-b border-surface-100 dark:border-surface-700">
+                          <p className="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{user?.name}</p>
+                          <p className="text-xs text-surface-500 dark:text-surface-400 truncate">{user?.email}</p>
                         </div>
                         <div className="p-1.5">
                           <button
                             onClick={() => { navigate("/profile"); setUserMenuOpen(false); }}
-                            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-surface-700 hover:bg-surface-50 rounded-xl transition-colors"
+                            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-700 rounded-xl transition-colors"
                           >
-                            <User className="w-4 h-4 text-surface-400" /> Mi perfil
+                            <User className="w-4 h-4 text-surface-400 dark:text-surface-500" /> Mi perfil
                           </button>
                           <button
                             onClick={() => { logout(); setUserMenuOpen(false); }}
-                            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
                           >
                             <LogOut className="w-4 h-4" /> Cerrar sesión
                           </button>
@@ -146,17 +149,18 @@ export default function Layout() {
               )}
             </div>
 
-            {/* Mobile: search + menu */}
+            {/* Mobile: search + menu + theme */}
             <div className="md:hidden flex items-center gap-1">
+              <ThemeToggle />
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="touch-target text-surface-600"
+                className="touch-target text-surface-600 dark:text-surface-400"
               >
                 <Search className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="touch-target text-surface-700"
+                className="touch-target text-surface-700 dark:text-surface-300"
               >
                 {mobileOpen ? <X className="w-5 h-5" /> : (
                   isAuthenticated ? (
@@ -177,7 +181,7 @@ export default function Layout() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-surface-100 bg-white overflow-hidden"
+              className="md:hidden border-t border-surface-100 dark:border-surface-700 bg-white dark:bg-surface-800 overflow-hidden"
             >
               <div className="section-container py-3">
                 <GlobalSearch
@@ -196,29 +200,45 @@ export default function Layout() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-surface-100 bg-white/98 backdrop-blur-xl overflow-hidden"
+              className="md:hidden border-t border-surface-100 dark:border-surface-700 bg-white/98 dark:bg-surface-800/98 backdrop-blur-xl overflow-hidden"
             >
               <div className="section-container py-3 flex flex-col gap-1">
+                {navItems.map(({ to, icon: Icon, label }) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    onClick={() => setMobileOpen(false)}
+                    className={({ isActive }) => cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-colors",
+                      isActive
+                        ? "bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-600 dark:text-brand-blue-400"
+                        : "text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-700"
+                    )}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {label}
+                  </NavLink>
+                ))}
                 {isAuthenticated ? (
                   <>
-                    <div className="flex items-center gap-3 px-4 py-3 mb-1 border-b border-surface-100">
+                    <div className="flex items-center gap-3 px-4 py-3 mb-1 border-b border-surface-100 dark:border-surface-700">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-blue-400 to-brand-green-400 flex items-center justify-center text-white font-bold">
                         {user?.name?.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-semibold text-surface-900 truncate">{user?.name}</p>
-                        <p className="text-xs text-surface-500 truncate">{user?.email}</p>
+                        <p className="font-semibold text-surface-900 dark:text-surface-100 truncate">{user?.name}</p>
+                        <p className="text-xs text-surface-500 dark:text-surface-400 truncate">{user?.email}</p>
                       </div>
                     </div>
                     <button
                       onClick={() => { navigate("/profile"); setMobileOpen(false); }}
-                      className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-surface-700 hover:bg-surface-50"
+                      className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-700"
                     >
-                      <User className="w-4 h-4 text-surface-400" /> Mi perfil
+                      <User className="w-4 h-4 text-surface-400 dark:text-surface-500" /> Mi perfil
                     </button>
                     <button
                       onClick={() => { logout(); setMobileOpen(false); }}
-                      className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-red-600 hover:bg-red-50"
+                      className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                     >
                       <LogOut className="w-4 h-4" /> Cerrar sesión
                     </button>
@@ -247,7 +267,7 @@ export default function Layout() {
       </main>
 
       {/* ─── Footer (solo desktop) ──────────────────────────── */}
-      <footer className="bg-surface-900 text-white mt-24 hidden md:block">
+      <footer className="bg-surface-900 dark:bg-surface-950 text-white mt-24 hidden md:block">
         <div className="section-container py-12">
           <div className="grid grid-cols-3 gap-8 mb-10">
             <div>
@@ -257,29 +277,29 @@ export default function Layout() {
                 </div>
                 Kultour
               </div>
-              <p className="text-surface-400 text-sm leading-relaxed">
+              <p className="text-surface-400 dark:text-surface-500 text-sm leading-relaxed">
                 Descubre lo mejor de La Paz. Eventos, lugares y experiencias únicas.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-surface-200">Explorar</h4>
-              <ul className="space-y-2 text-sm text-surface-400">
+              <h4 className="font-semibold mb-3 text-surface-200 dark:text-surface-300">Explorar</h4>
+              <ul className="space-y-2 text-sm text-surface-400 dark:text-surface-500">
                 <li><NavLink to="/explore" className="hover:text-white transition-colors">Eventos</NavLink></li>
                 <li><NavLink to="/map" className="hover:text-white transition-colors">Mapa</NavLink></li>
                 <li><NavLink to="/suggestions" className="hover:text-white transition-colors">Sugerencias</NavLink></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-surface-200">Cuenta</h4>
-              <ul className="space-y-2 text-sm text-surface-400">
+              <h4 className="font-semibold mb-3 text-surface-200 dark:text-surface-300">Cuenta</h4>
+              <ul className="space-y-2 text-sm text-surface-400 dark:text-surface-500">
                 <li><NavLink to="/profile" className="hover:text-white transition-colors">Mi perfil</NavLink></li>
                 <li><NavLink to="/dashboard" className="hover:text-white transition-colors">Panel organizador</NavLink></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-surface-800 pt-6 flex items-center justify-between">
-            <p className="text-surface-500 text-sm">© 2024 Kultour — La Paz, Bolivia 🏔️</p>
-            <p className="text-surface-600 text-xs">La ciudad más alta del mundo</p>
+          <div className="border-t border-surface-800 dark:border-surface-700 pt-6 flex items-center justify-between">
+            <p className="text-surface-500 dark:text-surface-600 text-sm">© 2024 Kultour — La Paz, Bolivia</p>
+            <p className="text-surface-600 dark:text-surface-700 text-xs">La ciudad más alta del mundo</p>
           </div>
         </div>
       </footer>

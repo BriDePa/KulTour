@@ -44,7 +44,7 @@ function ToastItem({ toast }: { toast: Toast }) {
       transition={{ type: "spring", damping: 20, stiffness: 300 }}
       className={cn(
         "flex items-start gap-3 w-full max-w-sm rounded-2xl px-4 py-3.5",
-        "shadow-card-hover border text-white",
+        "shadow-card-hover dark:shadow-card-hover-dark border text-white",
         cfg.bg, cfg.border
       )}
     >
@@ -52,7 +52,7 @@ function ToastItem({ toast }: { toast: Toast }) {
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm leading-snug">{toast.title}</p>
         {toast.message && (
-          <p className="text-white/80 text-xs mt-0.5 leading-relaxed">{toast.message}</p>
+          <p className="text-white/80 dark:text-white/70 text-xs mt-0.5 leading-relaxed">{toast.message}</p>
         )}
       </div>
       <button

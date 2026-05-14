@@ -6,21 +6,51 @@
   :root {
     --background: 248 250 252;
     --foreground: 15 23 42;
-    --brand-blue: 26 79 255;
-    --brand-green: 16 185 129;
-    --brand-orange: 255 144 0;
+    --card: 255 255 255;
+    --card-foreground: 15 23 42;
+    --primary: 26 79 255;
+    --primary-foreground: 255 255 255;
+    --secondary: 241 245 249;
+    --secondary-foreground: 15 23 42;
+    --muted: 241 245 249;
+    --muted-foreground: 100 116 139;
+    --accent: 241 245 249;
+    --accent-foreground: 15 23 42;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 26 79 255;
     --radius: 1rem;
-    /* Safe areas para notch y home indicator */
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-left: env(safe-area-inset-left, 0px);
     --safe-right: env(safe-area-inset-right, 0px);
   }
 
+  .dark {
+    --background: 15 23 42;
+    --foreground: 248 250 252;
+    --card: 30 41 59;
+    --card-foreground: 248 250 252;
+    --primary: 26 79 255;
+    --primary-foreground: 255 255 255;
+    --secondary: 51 65 85;
+    --secondary-foreground: 248 250 252;
+    --muted: 51 65 85;
+    --muted-foreground: 148 163 184;
+    --accent: 51 65 85;
+    --accent-foreground: 248 250 252;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --border: 51 65 85;
+    --input: 51 65 85;
+    --ring: 26 79 255;
+  }
+
   * {
-    @apply border-surface-200;
+    @apply border-surface-200 dark:border-surface-700;
     box-sizing: border-box;
-    /* Mejora el tap en móvil */
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -28,12 +58,11 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Previene zoom accidental en inputs en iOS */
     touch-action: manipulation;
   }
 
   body {
-    @apply bg-surface-50 text-surface-900 font-sans;
+    @apply bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-surface-50 font-sans;
     background-image: radial-gradient(
         ellipse at 10% 0%,
         rgba(26, 79, 255, 0.04) 0%,
@@ -45,24 +74,37 @@
         transparent 50%
       );
     background-attachment: fixed;
-    /* Espacio para bottom nav en móvil */
-    padding-bottom: calc(64px + var(--safe-bottom));
-    /* Previene overscroll bounce en iOS */
     overscroll-behavior: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* Quita el padding bottom cuando no hay bottom nav (desktop) */
+  .dark body {
+    background-image: radial-gradient(
+        ellipse at 10% 0%,
+        rgba(26, 79, 255, 0.08) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse at 90% 100%,
+        rgba(16, 185, 129, 0.06) 0%,
+        transparent 50%
+      );
+  }
+
+  .has-bottom-nav {
+    padding-bottom: calc(64px + var(--safe-bottom));
+  }
+
   @media (min-width: 768px) {
-    body {
+    .has-bottom-nav {
       padding-bottom: 0;
     }
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
+    font-family: DM Sans, system-ui, sans-serif;
   }
 
-  /* Inputs: font-size 16px mínimo en iOS para no hacer zoom */
   input, select, textarea {
     font-size: max(16px, 1em);
   }
@@ -71,85 +113,96 @@
       font-size: 0.875rem;
     }
   }
+
+  /* Smooth color transitions for theme switching (only on elements that opt in) */
+  .theme-transition, .theme-transition * {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
+  }
 }
 
 @layer components {
   /* ─── Scrollbar personalizado ─── */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { @apply bg-surface-100; }
-  ::-webkit-scrollbar-thumb { @apply bg-surface-300 rounded-full; }
-  ::-webkit-scrollbar-thumb:hover { @apply bg-surface-400; }
+  ::-webkit-scrollbar-track { @apply bg-surface-100 dark:bg-surface-800; }
+  ::-webkit-scrollbar-thumb { @apply bg-surface-300 dark:bg-surface-600 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-surface-400 dark:bg-surface-500; }
 
   /* ─── Glassmorphism ─── */
   .glass {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    @apply bg-white/80 dark:bg-surface-800/80 backdrop-blur-16 border border-white/60 dark:border-surface-700/50;
   }
   .glass-dark {
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    @apply bg-surface-900/80 dark:bg-surface-900/90 backdrop-blur-16 border border-surface-700/50 dark:border-surface-600/30;
   }
 
   /* ─── Cards ─── */
   .card-base {
-    @apply bg-white rounded-3xl shadow-card transition-all duration-300;
+    @apply bg-white dark:bg-surface-800 rounded-3xl shadow-card dark:shadow-card-dark transition-all duration-300;
   }
   .card-hover {
-    @apply hover:shadow-card-hover hover:-translate-y-1;
+    @apply hover:shadow-card-hover dark:hover:shadow-card-hover-dark hover:-translate-y-1;
   }
 
   /* ─── Gradient text ─── */
   .text-gradient-blue {
-    @apply bg-gradient-to-r from-brand-blue-500 to-brand-blue-700 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-brand-blue-500 to-brand-blue-700 dark:from-brand-blue-400 dark:to-brand-blue-600 bg-clip-text text-transparent;
   }
   .text-gradient-green {
-    @apply bg-gradient-to-r from-brand-green-500 to-brand-green-700 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-brand-green-500 to-brand-green-700 dark:from-brand-green-400 dark:to-brand-green-600 bg-clip-text text-transparent;
   }
   .text-gradient-brand {
-    @apply bg-gradient-to-r from-brand-blue-500 via-brand-green-500 to-brand-orange-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-brand-blue-500 via-brand-green-500 to-brand-orange-500 dark:from-brand-blue-400 dark:via-brand-green-400 dark:to-brand-orange-400 bg-clip-text text-transparent;
   }
 
   /* ─── Buttons ─── */
   .btn-primary {
     @apply bg-brand-blue-500 hover:bg-brand-blue-600 active:bg-brand-blue-700
+           dark:bg-brand-blue-600 dark:hover:bg-brand-blue-500 dark:active:bg-brand-blue-700
            text-white font-semibold px-6 py-3 rounded-2xl transition-all duration-150
-           shadow-soft hover:shadow-glow active:scale-95
+           shadow-soft hover:shadow-glow dark:hover:shadow-glow-dark active:scale-95
            inline-flex items-center gap-2 select-none;
-    /* Área mínima táctil de 44px */
     min-height: 44px;
   }
   .btn-secondary {
     @apply bg-white hover:bg-surface-50 active:bg-surface-100
-           text-surface-800 font-semibold px-6 py-3 rounded-2xl transition-all duration-150
+           dark:bg-surface-800 dark:hover:bg-surface-700 dark:active:bg-surface-600
+           text-surface-800 dark:text-surface-100 font-semibold px-6 py-3 rounded-2xl transition-all duration-150
            shadow-soft border border-surface-200 hover:border-surface-300
+           dark:border-surface-700 dark:hover:border-surface-600
            active:scale-95 inline-flex items-center gap-2 select-none;
     min-height: 44px;
   }
   .btn-ghost {
     @apply text-surface-600 hover:text-surface-900 hover:bg-surface-100 active:bg-surface-200
+           dark:text-surface-400 dark:hover:text-surface-100 dark:hover:bg-surface-800 dark:active:bg-surface-700
            font-medium px-4 py-2 rounded-xl transition-all duration-150
+           inline-flex items-center gap-2 select-none;
+    min-height: 44px;
+  }
+  .btn-danger {
+    @apply bg-red-500 hover:bg-red-600 active:bg-red-700
+           text-white font-semibold px-6 py-3 rounded-2xl transition-all duration-150
+           shadow-soft active:scale-95
            inline-flex items-center gap-2 select-none;
     min-height: 44px;
   }
 
   /* ─── Inputs ─── */
   .input-base {
-    @apply w-full bg-white border border-surface-200 rounded-2xl px-4 py-3
-           text-surface-900 placeholder:text-surface-400 outline-none
+    @apply w-full bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-2xl px-4 py-3
+           text-surface-900 dark:text-surface-100 placeholder:text-surface-400 dark:placeholder:text-surface-500 outline-none
            transition-all duration-200 font-sans
-           focus:border-brand-blue-400 focus:ring-4 focus:ring-brand-blue-500/10;
+           focus:border-brand-blue-400 dark:focus:border-brand-blue-400 focus:ring-4 focus:ring-brand-blue-500/10 dark:focus:ring-brand-blue-500/20;
     min-height: 48px;
   }
 
   /* ─── Badge ─── */
   .badge { @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold; }
-  .badge-blue { @apply badge bg-brand-blue-50 text-brand-blue-600; }
-  .badge-green { @apply badge bg-brand-green-50 text-brand-green-600; }
-  .badge-orange { @apply badge bg-brand-orange-50 text-brand-orange-600; }
+  .badge-blue { @apply badge bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-600 dark:text-brand-blue-400; }
+  .badge-green { @apply badge bg-brand-green-50 dark:bg-brand-green-900/30 text-brand-green-600 dark:text-brand-green-400; }
+  .badge-orange { @apply badge bg-brand-orange-50 dark:bg-brand-orange-900/30 text-brand-orange-600 dark:text-brand-orange-400; }
 
   /* ─── Section container ─── */
   .section-container {
@@ -157,7 +210,7 @@
   }
 
   /* ─── Skeleton loading ─── */
-  .skeleton { @apply animate-pulse bg-surface-200 rounded-2xl; }
+  .skeleton { @apply animate-pulse bg-surface-200 dark:bg-surface-700 rounded-2xl; }
 
   /* ─── Bottom Navigation (solo móvil) ─── */
   .bottom-nav {
@@ -166,10 +219,8 @@
     left: 0;
     right: 0;
     z-index: 40;
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    background-color: rgba(255, 255, 255, 0.92);
+    border-top: 1px solid rgba(226, 232, 240, 0.6);
     padding-bottom: var(--safe-bottom);
     height: calc(64px + var(--safe-bottom));
     display: flex;
@@ -177,15 +228,26 @@
     padding-top: 8px;
   }
 
+  .dark .bottom-nav {
+    background-color: rgba(30, 41, 59, 0.95);
+    border-top-color: rgba(51, 65, 85, 0.5);
+  }
+
+  @media (min-width: 768px) {
+    .bottom-nav {
+      display: none;
+    }
+  }
+
   .bottom-nav-item {
     @apply flex-1 flex flex-col items-center gap-1 py-1 transition-all duration-200
-           text-surface-400 select-none cursor-pointer active:scale-90;
+           text-surface-400 dark:text-surface-500 select-none cursor-pointer active:scale-90;
     min-height: 44px;
     -webkit-tap-highlight-color: transparent;
   }
 
   .bottom-nav-item.active {
-    @apply text-brand-blue-500;
+    @apply text-brand-blue-500 dark:text-brand-blue-400;
   }
 
   .bottom-nav-item span {
@@ -194,20 +256,20 @@
 
   /* ─── PWA install banner ─── */
   .pwa-banner {
-    @apply fixed bottom-0 left-0 right-0 z-50 bg-surface-900 text-white
-           flex items-center gap-3 px-4 py-4 shadow-card-hover;
+    @apply fixed bottom-0 left-0 right-0 z-50 bg-surface-900 dark:bg-surface-950 text-white
+           flex items-center gap-3 px-4 py-4 shadow-card-hover dark:shadow-card-hover-dark;
     padding-bottom: calc(1rem + var(--safe-bottom));
   }
 
   /* ─── Pull to refresh indicator ─── */
   .ptr-indicator {
     @apply absolute top-0 left-0 right-0 flex justify-center
-           py-3 text-brand-blue-500 font-medium text-sm;
+           py-3 text-brand-blue-500 dark:text-brand-blue-400 font-medium text-sm;
   }
 
   /* ─── Sticky header con safe area ─── */
   .sticky-header {
-    @apply sticky z-50 glass border-b border-white/60;
+    @apply sticky z-50 glass border-b border-white/60 dark:border-surface-700/50;
     top: var(--safe-top, 0);
   }
 }
@@ -217,17 +279,25 @@
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   .text-balance { text-wrap: balance; }
 
-  /* Safe area utilities */
   .pt-safe { padding-top: var(--safe-top); }
   .pb-safe { padding-bottom: var(--safe-bottom); }
   .pl-safe { padding-left: var(--safe-left); }
   .pr-safe { padding-right: var(--safe-right); }
 
-  /* Área táctil mínima */
   .touch-target {
     min-width: 44px;
     min-height: 44px;
     @apply flex items-center justify-center;
+  }
+
+  .backdrop-blur-16 {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .backdrop-blur-20 {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 }
 
@@ -268,7 +338,6 @@
   @media (max-width: 640px) {
     .card-base { @apply rounded-2xl; }
 
-    /* Padding interno de cards más holgado */
     .card-base > div,
     .card-base > article {
       padding: 1.25rem;
@@ -277,20 +346,20 @@
 
   /* ─── Prose: texto de descripción más legible ─────────────── */
   .prose-kultour {
-    @apply text-surface-600 leading-relaxed;
+    @apply text-surface-600 dark:text-surface-400 leading-relaxed;
     font-size: clamp(0.9rem, 2.5vw, 1rem);
   }
 
   /* ─── Section headings con espacio correcto ───────────────── */
   .section-heading {
-    @apply font-display font-extrabold text-surface-900;
+    @apply font-extrabold text-surface-900 dark:text-surface-50; font-family: DM Sans, system-ui, sans-serif;
     font-size: clamp(1.75rem, 5vw, 2.5rem);
     line-height: 1.1;
     letter-spacing: -0.025em;
   }
 
   .section-subheading {
-    @apply text-surface-500 leading-relaxed;
+    @apply text-surface-500 dark:text-surface-400 leading-relaxed;
     font-size: clamp(0.95rem, 2.5vw, 1.125rem);
     margin-top: 0.75rem;
   }
@@ -304,13 +373,14 @@
     font-size: clamp(1.75rem, 6vw, 3rem);
     line-height: 1.1;
     letter-spacing: -0.03em;
-    @apply font-display font-extrabold;
+    @apply font-extrabold;
+    font-family: DM Sans, system-ui, sans-serif;
   }
 
   .page-header p {
     font-size: clamp(0.9rem, 2.5vw, 1.125rem);
     line-height: 1.65;
-    @apply text-white/70 mt-2;
+    @apply text-white/70 dark:text-white/60 mt-2;
   }
 
   /* ─── Event/Place card typography ────────────────────────── */
@@ -318,19 +388,19 @@
     font-size: clamp(1rem, 2.5vw, 1.125rem);
     line-height: 1.3;
     letter-spacing: -0.01em;
-    @apply font-display font-bold text-surface-900;
+    @apply font-bold text-surface-900 dark:text-surface-50; font-family: DM Sans, system-ui, sans-serif;
   }
 
   .card-description {
     font-size: clamp(0.82rem, 2vw, 0.875rem);
     line-height: 1.6;
-    @apply text-surface-500;
+    @apply text-surface-500 dark:text-surface-400;
   }
 
   .card-meta {
     font-size: clamp(0.75rem, 1.8vw, 0.8rem);
     line-height: 1.5;
-    @apply text-surface-400 font-medium;
+    @apply text-surface-400 dark:text-surface-500 font-medium;
   }
 
   /* ─── Badges más legibles ─────────────────────────────────── */
@@ -351,19 +421,19 @@
 
   /* ─── Input labels ─────────────────────────────────────────── */
   .input-label {
-    @apply block text-sm font-semibold text-surface-700 mb-2;
+    @apply block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2;
     letter-spacing: -0.005em;
   }
 
   /* ─── Empty states ─────────────────────────────────────────── */
   .empty-state-title {
     font-size: clamp(1.125rem, 3vw, 1.25rem);
-    @apply font-display font-bold text-surface-900;
+    @apply font-bold text-surface-900 dark:text-surface-50; font-family: DM Sans, system-ui, sans-serif;
   }
 
   .empty-state-text {
     font-size: clamp(0.875rem, 2vw, 0.95rem);
-    @apply text-surface-500 leading-relaxed;
+    @apply text-surface-500 dark:text-surface-400 leading-relaxed;
   }
 
   /* ─── Fix: line-clamp en cards ─────────────────────────────── */
@@ -379,5 +449,12 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  /* ─── Theme toggle button ─────────────────────────────────── */
+  .theme-toggle {
+    @apply w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200
+           text-surface-500 hover:text-surface-900 hover:bg-surface-100
+           dark:text-surface-400 dark:hover:text-surface-100 dark:hover:bg-surface-800;
   }
 }
