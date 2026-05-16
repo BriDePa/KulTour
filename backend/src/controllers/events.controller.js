@@ -113,6 +113,7 @@ const createEvent = async (req, res, next) => {
       category,
       ticketUrl,
       cityId,
+      placeId,
     } = req.body;
 
     if (!title || !description || !date || !venue || !address || !cityId) {
@@ -126,6 +127,9 @@ const createEvent = async (req, res, next) => {
     if (!city) {
       return res.status(404).json({ success: false, message: "Ciudad no encontrada" });
     }
+
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+    const isVerified = user?.isVerified || false;
 
     const event = await prisma.event.create({
       data: {
@@ -145,7 +149,9 @@ const createEvent = async (req, res, next) => {
         category,
         ticketUrl,
         cityId,
+        placeId: placeId || null,
         organizerId: req.user.id,
+        isVerified,
         status: "PUBLISHED",
       },
       include: {
@@ -180,7 +186,7 @@ const updateEvent = async (req, res, next) => {
     const {
       title, description, imageUrl, date, endDate, price, isFree,
       capacity, venue, address, latitude, longitude, tags,
-      category, ticketUrl, status, cityId,
+      category, ticketUrl, status, cityId, placeId,
     } = req.body;
 
     const updated = await prisma.event.update({
@@ -201,6 +207,7 @@ const updateEvent = async (req, res, next) => {
         ...(tags !== undefined && { tags }),
         ...(category !== undefined && { category }),
         ...(ticketUrl !== undefined && { ticketUrl }),
+        ...(placeId !== undefined && { placeId: placeId || null }),
         ...(status !== undefined && req.user.role === "ADMIN" && { status }),
         ...(cityId !== undefined && req.user.role === "ADMIN" && { cityId }),
       },

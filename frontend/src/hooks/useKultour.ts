@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { eventsService, placesService, suggestionsService, citiesService, searchService, uploadService } from "@/services/api.service";
-import type { EventFilters, PlaceFilters, SuggestionQuery, CreateEventForm } from "@/types";
+import type { EventFilters, PlaceFilters, SuggestionQuery, CreateEventForm, CreatePlaceForm, UpdatePlaceForm } from "@/types";
 
 // ─── Events Hooks ─────────────────────────────────────────
 export function useEvents(filters?: EventFilters) {
@@ -69,6 +69,35 @@ export function usePlace(id: string) {
     queryKey: ["place", id],
     queryFn: () => placesService.getById(id),
     enabled: !!id,
+  });
+}
+
+export function useCreatePlace() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreatePlaceForm) => placesService.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["places"] });
+    },
+  });
+}
+
+export function useUpdatePlace() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdatePlaceForm }) => placesService.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["places"] });
+    },
+  });
+}
+
+export function useMyPlaces(ownerId?: string) {
+  return useQuery({
+    queryKey: ["places", "my", ownerId],
+    queryFn: () => placesService.getAll({ limit: 50, ownerId }),
+    enabled: !!ownerId,
+    staleTime: 1000 * 60 * 2,
   });
 }
 

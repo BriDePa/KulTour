@@ -115,6 +115,7 @@ export default function PlaceDetailPage() {
       <div className="relative h-72 sm:h-96 overflow-hidden">
         {place.imageUrl ? (
           <img src={place.imageUrl} alt={place.name}
+            loading="eager"
             className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-brand-green-400 to-brand-blue-400 flex items-center justify-center">
@@ -177,7 +178,7 @@ export default function PlaceDetailPage() {
               {place.priceRange && (
                 <div className="flex items-center gap-2 bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 px-4 py-2.5 rounded-2xl text-sm font-medium">
                   {place.priceRange} ·{" "}
-                  {{ "$": "Económico", "$$": "Moderado", "$$$": "Premium" }[place.priceRange] || ""}
+                  {{ "$": "Económico", "$$": "Moderado", "$$$": "Premium" }[place.priceRange] || place.priceRange}
                 </div>
               )}
             </motion.div>

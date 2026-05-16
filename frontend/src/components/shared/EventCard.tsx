@@ -39,6 +39,7 @@ export const EventCard = memo(function EventCard({ event, compact = false }: Eve
             <img
               src={event.imageUrl}
               alt={event.title}
+              loading="lazy"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (

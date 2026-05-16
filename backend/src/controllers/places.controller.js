@@ -14,6 +14,7 @@ const getPlaces = async (req, res, next) => {
       search,
       sortBy = "rating",
       order = "desc",
+      ownerId,
     } = req.query;
 
     const safeSortBy = ALLOWED_PLACE_SORT.includes(sortBy) ? sortBy : "rating";
@@ -25,6 +26,7 @@ const getPlaces = async (req, res, next) => {
     if (category) where.category = category;
     if (cityId) where.cityId = cityId;
     if (featured === "true") where.featured = true;
+    if (ownerId) where.ownerId = ownerId;
     if (search) {
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
@@ -162,4 +164,52 @@ const getFeaturedPlaces = async (req, res, next) => {
   }
 };
 
-module.exports = { getPlaces, getPlaceById, createPlace, getFeaturedPlaces };
+const updatePlace = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const place = await prisma.place.findUnique({ where: { id } });
+    if (!place) {
+      return res.status(404).json({ success: false, message: "Lugar no encontrado" });
+    }
+
+    if (place.ownerId !== req.user.id && req.user.role !== "ADMIN") {
+      return res.status(403).json({ success: false, message: "Sin permisos" });
+    }
+
+    const {
+      name, description, imageUrl, category, address,
+      latitude, longitude, phone, website, instagram,
+      openingHours, priceRange, tags,
+    } = req.body;
+
+    const updated = await prisma.place.update({
+      where: { id },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(description !== undefined && { description }),
+        ...(imageUrl !== undefined && { imageUrl }),
+        ...(category !== undefined && { category }),
+        ...(address !== undefined && { address }),
+        ...(latitude !== undefined && { latitude: latitude ? parseFloat(latitude) : null }),
+        ...(longitude !== undefined && { longitude: longitude ? parseFloat(longitude) : null }),
+        ...(phone !== undefined && { phone }),
+        ...(website !== undefined && { website }),
+        ...(instagram !== undefined && { instagram }),
+        ...(openingHours !== undefined && { openingHours }),
+        ...(priceRange !== undefined && { priceRange }),
+        ...(tags !== undefined && { tags }),
+      },
+      include: {
+        city: { select: { name: true } },
+        owner: { select: { id: true, name: true } },
+      },
+    });
+
+    res.json({ success: true, message: "Lugar actualizado", data: { place: updated } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getPlaces, getPlaceById, createPlace, getFeaturedPlaces, updatePlace };

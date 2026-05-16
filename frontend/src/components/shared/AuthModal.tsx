@@ -215,8 +215,8 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
         <p className="text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">¿Cómo vas a usar Kultour?</p>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { value: "USER",      label: "Explorador",   icon: Compass, desc: "Descubro eventos" },
-            { value: "ORGANIZER", label: "Organizador",  icon: Sparkles, desc: "Creo eventos" },
+            { value: "USER",      label: "Explorador",   icon: Compass, desc: "Exploro, guardo favoritos y escribo reseñas" },
+            { value: "ORGANIZER", label: "Organizador",  icon: Sparkles, desc: "Creo y gestiono eventos y lugares" },
           ].map((opt) => (
             <button
               key={opt.value}

@@ -42,6 +42,7 @@ const PlaceCard = memo(function PlaceCard({ place, onClick }: PlaceCardProps) {
       <div className="relative overflow-hidden aspect-[4/3]">
         {place.imageUrl ? (
           <img src={place.imageUrl} alt={place.name}
+            loading="lazy"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-brand-green-400 to-brand-blue-400 flex items-center justify-center">

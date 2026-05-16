@@ -35,7 +35,7 @@ const register = async (req, res, next) => {
       });
     }
 
-    const allowedRoles = ["USER", "ORGANIZER"];
+    const allowedRoles = ["USER", "ADMIN"];
     const userRole = allowedRoles.includes(role) ? role : "USER";
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -46,12 +46,14 @@ const register = async (req, res, next) => {
         name,
         password: hashedPassword,
         role: userRole,
+        isVerified: false,
       },
       select: {
         id: true,
         email: true,
         name: true,
         role: true,
+        isVerified: true,
         avatar: true,
         createdAt: true,
       },
@@ -73,8 +75,6 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    console.log("[AUTH LOGIN] Datos recibidos:", { email, hasPassword: !!password });
-
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -84,7 +84,6 @@ const login = async (req, res, next) => {
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
-    console.log("[AUTH LOGIN] Usuario encontrado:", user ? { id: user.id, role: user.role } : null);
 
     if (!user) {
       return res.status(401).json({
@@ -95,7 +94,6 @@ const login = async (req, res, next) => {
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
-    console.log("[AUTH LOGIN] Password válido:", isValidPassword);
 
     if (!isValidPassword) {
       return res.status(401).json({
@@ -106,13 +104,13 @@ const login = async (req, res, next) => {
     }
 
     const token = generateToken(user.id);
-    console.log("[AUTH LOGIN] Token generado para usuario:", user.id);
 
     const userData = {
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
+      isVerified: user.isVerified,
       avatar: user.avatar,
       bio: user.bio,
       phone: user.phone,
@@ -125,7 +123,6 @@ const login = async (req, res, next) => {
       data: { user: userData, token },
     });
   } catch (error) {
-    console.error("[AUTH LOGIN] Error:", error);
     next(error);
   }
 };
@@ -139,6 +136,7 @@ const me = async (req, res, next) => {
         email: true,
         name: true,
         role: true,
+        isVerified: true,
         avatar: true,
         bio: true,
         phone: true,
@@ -179,6 +177,7 @@ const updateProfile = async (req, res, next) => {
         email: true,
         name: true,
         role: true,
+        isVerified: true,
         avatar: true,
         bio: true,
         phone: true,
@@ -330,6 +329,41 @@ const deleteAccount = async (req, res, next) => {
   }
 };
 
+const verifyRequest = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "Tu cuenta ya está verificada",
+      });
+    }
+
+    const notification = await prisma.notification.create({
+      data: {
+        userId: userId,
+        type: "SYSTEM",
+        title: "Solicitud de verificación enviada",
+        message: "Tu solicitud de verificación ha sido enviada. Te notificaremos cuando sea procesada.",
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Solicitud de verificación enviada exitosamente",
+      data: { notification },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -338,4 +372,5 @@ module.exports = {
   changePassword,
   deleteAccount,
   debugLogin,
+  verifyRequest,
 };

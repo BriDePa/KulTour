@@ -1,9 +1,11 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, SlidersHorizontal, X, Calendar, MapPin, Tag, ChevronDown, CalendarDays } from "lucide-react";
 import { useEvents, usePlaces } from "@/hooks/useKultour";
+import { useDebounce } from "@/hooks/useDebounce";
 import EventCard from "@/components/shared/EventCard";
 import PlaceCard from "@/components/shared/PlaceCard";
+import { SkeletonGrid } from "@/components/shared/SkeletonCard";
 import { cn, EVENT_CATEGORIES, PLACE_CATEGORY_LABELS } from "@/lib/utils";
 import type { EventFilters, PlaceFilters, PlaceCategory } from "@/types";
 
@@ -20,16 +22,6 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
     >
       {label}
     </button>
-  );
-}
-
-function SkeletonGrid({ count = 6 }: { count?: number }) {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[...Array(count)].map((_, i) => (
-        <div key={i} className="skeleton h-80 rounded-3xl" />
-      ))}
-    </div>
   );
 }
 
@@ -56,17 +48,14 @@ function EmptyState({ tab }: { tab: string }) {
 export default function ExplorePage() {
   const [activeTab, setActiveTab] = useState<"events" | "places">("events");
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [showFilters, setShowFilters] = useState(false);
   const [eventCategory, setEventCategory] = useState<string>("");
   const [placeCategory, setPlaceCategory] = useState<string>("");
   const [isFree, setIsFree] = useState(false);
-  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleSearch = useCallback((val: string) => {
     setSearch(val);
-    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-    searchTimeoutRef.current = setTimeout(() => setDebouncedSearch(val), 400);
   }, []);
 
   const eventFilters: EventFilters = {
@@ -121,7 +110,7 @@ export default function ExplorePage() {
               />
               {search && (
                 <button
-                  onClick={() => { setSearch(""); setDebouncedSearch(""); }}
+                  onClick={() => setSearch("")}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-700 dark:hover:text-surface-300 transition-colors"
                 >
                   <X className="w-4 h-4" />
@@ -231,7 +220,6 @@ export default function ExplorePage() {
                 setPlaceCategory("");
                 setIsFree(false);
                 setSearch("");
-                setDebouncedSearch("");
               }}
               className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600 font-medium whitespace-nowrap"
             >

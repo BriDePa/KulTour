@@ -76,6 +76,7 @@ export default function EventDetailPage() {
           <img
             src={event.imageUrl}
             alt={event.title}
+            loading="eager"
             className="w-full h-full object-cover"
           />
         ) : (
@@ -305,10 +306,10 @@ export default function EventDetailPage() {
               </h3>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-blue-400 to-brand-green-400 flex items-center justify-center text-white text-lg font-bold">
-                  {event.organizer.name.charAt(0)}
+                  {event.organizer?.name?.charAt(0) || "?"}
                 </div>
                 <div>
-                  <p className="font-semibold text-surface-900 dark:text-surface-100">{event.organizer.name}</p>
+                  <p className="font-semibold text-surface-900 dark:text-surface-100">{event.organizer?.name || "Anónimo"}</p>
                   <div className="flex items-center gap-1 text-xs text-brand-orange-500 dark:text-brand-orange-400">
                     <Star className="w-3 h-3 fill-brand-orange-500" />
                     <span className="font-medium">Organizador verificado</span>

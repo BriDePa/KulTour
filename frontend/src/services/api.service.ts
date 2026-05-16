@@ -14,9 +14,12 @@ import type {
   CreateEventForm,
   Favorite,
   Review,
+  EventReview,
   Notification,
   SearchResult,
   UpdateProfileForm,
+  FavoriteList,
+  FavoriteListItem,
 } from "@/types";
 
 // ─── Auth ─────────────────────────────────────────────────
@@ -71,7 +74,7 @@ export const eventsService = {
 
 // ─── Places ───────────────────────────────────────────────
 export const placesService = {
-  getAll: async (filters?: PlaceFilters) => {
+  getAll: async (filters?: PlaceFilters & { ownerId?: string }) => {
     const res = await api.get("/places", { params: filters });
     return res.data.data as { places: Place[]; pagination: any };
   },
@@ -88,6 +91,11 @@ export const placesService = {
 
   create: async (data: Partial<Place>) => {
     const res = await api.post("/places", data);
+    return res.data.data.place as Place;
+  },
+
+  update: async (id: string, data: Partial<Place>) => {
+    const res = await api.put(`/places/${id}`, data);
     return res.data.data.place as Place;
   },
 };
@@ -195,5 +203,68 @@ export const profileService = {
 
   deleteAccount: async () => {
     await api.delete("/profile");
+  },
+};
+
+// ─── Event Reviews ──────────────────────────────────────────
+export const eventReviewsService = {
+  getByEvent: async (eventId: string, page = 1, limit = 10) => {
+    const res = await api.get(`/event-reviews/events/${eventId}/reviews`, { params: { page, limit } });
+    return res.data.data as { reviews: EventReview[]; pagination: any };
+  },
+
+  create: async (eventId: string, rating: number, comment?: string) => {
+    const res = await api.post(`/event-reviews/events/${eventId}/reviews`, { rating, comment });
+    return res.data.data.review as EventReview;
+  },
+
+  update: async (id: string, rating: number, comment?: string) => {
+    const res = await api.put(`/event-reviews/reviews/${id}`, { rating, comment });
+    return res.data.data.review as EventReview;
+  },
+
+  delete: async (id: string) => {
+    await api.delete(`/event-reviews/reviews/${id}`);
+  },
+
+  getMyReviews: async (page = 1, limit = 10) => {
+    const res = await api.get("/event-reviews/reviews/my-events", { params: { page, limit } });
+    return res.data.data as { reviews: (EventReview & { event: Event })[]; pagination: any };
+  },
+};
+
+// ─── Favorite Lists ──────────────────────────────────────────
+export const favoriteListsService = {
+  getAll: async () => {
+    const res = await api.get("/favorite-lists/lists");
+    return res.data.data.lists as FavoriteList[];
+  },
+
+  create: async (name: string, description?: string, isPublic = false) => {
+    const res = await api.post("/favorite-lists/lists", { name, description, isPublic });
+    return res.data.data.list as FavoriteList;
+  },
+
+  update: async (id: string, data: { name?: string; description?: string; isPublic?: boolean }) => {
+    const res = await api.put(`/favorite-lists/lists/${id}`, data);
+    return res.data.data.list as FavoriteList;
+  },
+
+  delete: async (id: string) => {
+    await api.delete(`/favorite-lists/lists/${id}`);
+  },
+
+  getItems: async (id: string) => {
+    const res = await api.get(`/favorite-lists/lists/${id}/items`);
+    return res.data.data.list as FavoriteList;
+  },
+
+  addItem: async (listId: string, eventId?: string, placeId?: string) => {
+    const res = await api.post(`/favorite-lists/lists/${listId}/items`, { eventId, placeId });
+    return res.data.data.item as FavoriteListItem;
+  },
+
+  removeItem: async (listId: string, itemId: string) => {
+    await api.delete(`/favorite-lists/lists/${listId}/items/${itemId}`);
   },
 };

@@ -43,7 +43,9 @@ api.interceptors.response.use(
     // Error 401 - No autenticado
     if (axiosResponse?.status === 401) {
       localStorage.removeItem("kultour_token");
-      if (!window.location.pathname.includes("/")) {
+      const publicRoutes = ["/", "/explore", "/map", "/suggestions", "/events/", "/places/"];
+      const isPublicRoute = publicRoutes.some(route => window.location.pathname.startsWith(route));
+      if (!isPublicRoute) {
         window.location.href = "/";
       }
     }

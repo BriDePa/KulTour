@@ -609,7 +609,7 @@ export default function MapPage() {
     name: string;
     distance: number;
   } | null>(null);
-  const [isPulsing] = useState(true);
+  const isPulsing = true;
   const [showGeofenceAlert, setShowGeofenceAlert] = useState(true);
   const mapRef = useRef<L.Map | null>(null);
   const geofenceNotifiedRef = useRef<Set<string>>(new Set());

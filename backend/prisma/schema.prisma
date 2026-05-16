@@ -20,6 +20,13 @@ enum EventStatus {
   FINISHED
 }
 
+enum RecurrenceType {
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
 enum PlaceCategory {
   BAR
   RESTAURANT
@@ -47,17 +54,20 @@ model User {
   name        String
   password    String
   role        Role      @default(USER)
+  isVerified  Boolean   @default(false)
   avatar      String?
   bio         String?
   phone       String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  events        Event[]
-  places        Place[]
-  favorites     Favorite[]
-  reviews       Review[]
-  notifications Notification[]
+  events          Event[]
+  places          Place[]
+  favorites       Favorite[]
+  reviews         Review[]
+  eventReviews    EventReview[]
+  favoriteLists  FavoriteList[]
+  notifications   Notification[]
 
   @@map("users")
 }
@@ -95,22 +105,37 @@ model Event {
   status       EventStatus @default(PUBLISHED)
   category     String?
   featured     Boolean     @default(false)
-  ticketUrl    String?
-  
+ticketUrl    String?
+  isVerified   Boolean     @default(false)
+  rating       Float?      @default(0)
+  recurrenceType     RecurrenceType?
+  recurrenceEndDate DateTime?
+  isRecurrence      Boolean     @default(false)
+  parentEventId     String?
+
+  parentEvent Event?  @relation("EventRecurrence", fields: [parentEventId], references: [id])
+  occurrences Event[] @relation("EventRecurrence")
+
   cityId       String
   city         City        @relation(fields: [cityId], references: [id])
   
-  organizerId  String
-  organizer    User        @relation(fields: [organizerId], references: [id])
+   organizerId  String
+   organizer    User        @relation(fields: [organizerId], references: [id])
 
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+   placeId      String?
+   place        Place?      @relation(fields: [placeId], references: [id])
 
-  favorites    Favorite[]
+   createdAt    DateTime    @default(now())
+   updatedAt    DateTime    @updatedAt
 
-  @@index([status, date])
-  @@index([cityId, category])
-  @@map("events")
+   favorites    Favorite[]
+   eventReviews EventReview[]
+   listItems    FavoriteListItem[]
+
+   @@index([status, date])
+   @@index([cityId, category])
+   @@index([placeId])
+   @@map("events")
 }
 
 model Place {
@@ -140,8 +165,10 @@ model Place {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  favorites    Favorite[]
-  reviews      Review[]
+   events       Event[]
+   favorites    Favorite[]
+   reviews      Review[]
+   listItems    FavoriteListItem[]
 
   @@index([cityId, category])
   @@map("places")
@@ -177,6 +204,54 @@ model Review {
 
   @@unique([userId, placeId])
   @@map("reviews")
+}
+
+model EventReview {
+  id        String   @id @default(uuid())
+  userId    String
+  eventId   String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@map("event_reviews")
+}
+
+model FavoriteList {
+  id          String             @id @default(uuid())
+  userId      String
+  name        String
+  description String?
+  isPublic    Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  user  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items FavoriteListItem[]
+
+  @@index([userId])
+  @@map("favorite_lists")
+}
+
+model FavoriteListItem {
+  id          String        @id @default(uuid())
+  listId      String
+  eventId     String?
+  placeId     String?
+  addedAt     DateTime      @default(now())
+
+  list   FavoriteList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  event  Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  place  Place?       @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([listId, eventId])
+  @@unique([listId, placeId])
+  @@map("favorite_list_items")
 }
 
 model Notification {

@@ -63,7 +63,6 @@ export default function SuggestionsPage() {
   const handleSubmit = () => {
     if (!query.mood) return;
     setSubmitted(true);
-    if (submitted) refetch();
   };
 
   const handleReset = () => {

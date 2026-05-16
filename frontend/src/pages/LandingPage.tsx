@@ -649,7 +649,7 @@ export default function LandingPage() {
             </div>
             Kultour
           </div>
-          <p className="text-surface-500 text-sm">© 2024 Kultour — La Paz, Bolivia</p>
+          <p className="text-surface-500 text-sm">© 2026 Kultour — La Paz, Bolivia</p>
         </div>
       </footer>
     </div>

@@ -298,7 +298,7 @@ export default function Layout() {
             </div>
           </div>
           <div className="border-t border-surface-800 dark:border-surface-700 pt-6 flex items-center justify-between">
-            <p className="text-surface-500 dark:text-surface-600 text-sm">© 2024 Kultour — La Paz, Bolivia</p>
+            <p className="text-surface-500 dark:text-surface-600 text-sm">© 2026 Kultour — La Paz, Bolivia</p>
             <p className="text-surface-600 dark:text-surface-700 text-xs">La ciudad más alta del mundo</p>
           </div>
         </div>

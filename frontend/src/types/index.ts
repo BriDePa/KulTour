@@ -2,6 +2,7 @@
 
 export type Role = "USER" | "ORGANIZER" | "ADMIN";
 export type EventStatus = "DRAFT" | "PUBLISHED" | "CANCELLED" | "FINISHED";
+export type RecurrenceType = "DAILY" | "WEEKLY" | "BIWEEKLY" | "MONTHLY";
 export type PlaceCategory =
   | "BAR"
   | "RESTAURANT"
@@ -19,6 +20,7 @@ export interface User {
   email: string;
   name: string;
   role: Role;
+  isVerified?: boolean;
   avatar?: string;
   bio?: string;
   phone?: string;
@@ -55,7 +57,9 @@ export interface Event {
   category?: string;
   featured: boolean;
   ticketUrl?: string;
+  isVerified?: boolean;
   cityId: string;
+  placeId?: string;
   city: { name: string };
   organizerId: string;
   organizer: { id: string; name: string; avatar?: string };
@@ -188,6 +192,24 @@ export interface CreateEventForm {
   category?: string;
   ticketUrl?: string;
   cityId: string;
+  placeId?: string;
+}
+
+export interface CreatePlaceForm {
+  name: string;
+  description: string;
+  imageUrl?: string;
+  category?: PlaceCategory;
+  address: string;
+  latitude?: number;
+  longitude?: number;
+  phone?: string;
+  website?: string;
+  instagram?: string;
+  openingHours?: Record<string, string>;
+  priceRange?: string;
+  tags?: string[];
+  cityId: string;
 }
 
 // ─── Favorites ─────────────────────────────────────────────
@@ -234,4 +256,78 @@ export interface UpdateProfileForm {
   name?: string;
   bio?: string;
   avatar?: string;
+}
+
+// ─── Place Update ───────────────────────────────────────────
+export interface UpdatePlaceForm {
+  name?: string;
+  description?: string;
+  imageUrl?: string;
+  category?: PlaceCategory;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  phone?: string;
+  website?: string;
+  instagram?: string;
+  openingHours?: Record<string, string>;
+  priceRange?: string;
+  tags?: string[];
+}
+
+// ─── Event Reviews ───────────────────────────────────────────
+export interface EventReview {
+  id: string;
+  userId: string;
+  eventId: string;
+  rating: number;
+  comment?: string;
+  user: { id: string; name: string; avatar?: string };
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// ─── Favorite Lists ──────────────────────────────────────────
+export interface FavoriteList {
+  id: string;
+  userId: string;
+  name: string;
+  description?: string;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+  items?: FavoriteListItem[];
+}
+
+export interface FavoriteListItem {
+  id: string;
+  listId: string;
+  eventId?: string;
+  placeId?: string;
+  addedAt: string;
+  event?: Event;
+  place?: Place;
+}
+
+// ─── Event Recurrence ───────────────────────────────────────
+export interface CreateEventForm {
+  title: string;
+  description: string;
+  imageUrl?: string;
+  date: string;
+  endDate?: string;
+  price?: number;
+  isFree: boolean;
+  capacity?: number;
+  venue: string;
+  address: string;
+  latitude?: number;
+  longitude?: number;
+  tags?: string[];
+  category?: string;
+  ticketUrl?: string;
+  cityId: string;
+  placeId?: string;
+  recurrenceType?: RecurrenceType;
+  recurrenceEndDate?: string;
 }

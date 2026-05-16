@@ -6,16 +6,18 @@ const morgan = require("morgan");
 const path = require("path");
 const os = require("os");
 
-const authRoutes        = require("./routes/auth.routes");
-const eventsRoutes      = require("./routes/events.routes");
-const placesRoutes      = require("./routes/places.routes");
-const suggestionsRoutes = require("./routes/suggestions.routes");
-const citiesRoutes      = require("./routes/cities.routes");
-const searchRoutes      = require("./routes/search.routes");
-const favoritesRoutes   = require("./routes/favorites.routes");
-const reviewsRoutes     = require("./routes/reviews.routes");
-const notificationsRoutes = require("./routes/notifications.routes");
-const uploadRoutes      = require("./routes/upload.routes");
+const authRoutes            = require("./routes/auth.routes");
+const eventsRoutes          = require("./routes/events.routes");
+const placesRoutes          = require("./routes/places.routes");
+const suggestionsRoutes     = require("./routes/suggestions.routes");
+const citiesRoutes          = require("./routes/cities.routes");
+const searchRoutes          = require("./routes/search.routes");
+const favoritesRoutes       = require("./routes/favorites.routes");
+const reviewsRoutes         = require("./routes/reviews.routes");
+const eventReviewsRoutes    = require("./routes/eventReviews.routes");
+const favoriteListsRoutes   = require("./routes/favoriteLists.routes");
+const notificationsRoutes   = require("./routes/notifications.routes");
+const uploadRoutes          = require("./routes/upload.routes");
 const { errorHandler, notFound } = require("./middlewares/error.middleware");
 const { standardLimiter } = require("./middlewares/rateLimiter");
 
@@ -68,16 +70,18 @@ app.get("/health", (req, res) => {
     timestamp: new Date().toISOString(), network: getLocalIPs() });
 });
 
-app.use("/api/auth",          authRoutes);
-app.use("/api/events",        eventsRoutes);
-app.use("/api/places",        placesRoutes);
-app.use("/api/suggestions",   suggestionsRoutes);
-app.use("/api/cities",        citiesRoutes);
-app.use("/api/search",        searchRoutes);
-app.use("/api/favorites",     favoritesRoutes);
-app.use("/api/reviews",       reviewsRoutes);
-app.use("/api/notifications", notificationsRoutes);
-app.use("/api/upload",        uploadRoutes);
+app.use("/api/auth",            authRoutes);
+app.use("/api/events",          eventsRoutes);
+app.use("/api/places",          placesRoutes);
+app.use("/api/suggestions",     suggestionsRoutes);
+app.use("/api/cities",          citiesRoutes);
+app.use("/api/search",          searchRoutes);
+app.use("/api/favorites",       favoritesRoutes);
+app.use("/api/reviews",         reviewsRoutes);
+app.use("/api/event-reviews",   eventReviewsRoutes);
+app.use("/api/favorite-lists",  favoriteListsRoutes);
+app.use("/api/notifications",   notificationsRoutes);
+app.use("/api/upload",          uploadRoutes);
 
 app.use(standardLimiter);
 app.use(notFound);

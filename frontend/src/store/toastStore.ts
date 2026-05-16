@@ -24,7 +24,9 @@ export const useToastStore = create<ToastStore>((set, get) => ({
   toasts: [],
 
   add: (toast) => {
-    const id = Math.random().toString(36).slice(2);
+    const id = typeof crypto !== "undefined" && crypto.randomUUID 
+      ? crypto.randomUUID() 
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
     const duration = toast.duration ?? 4000;
     set((s) => ({ toasts: [...s.toasts, { ...toast, id }] }));
     if (duration > 0) {
